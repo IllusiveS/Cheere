@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "GameplayEffectTypes.h"
 #include "TopDownerCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -15,7 +16,7 @@ class ATopDownerCharacter : public ACharacter, public IAbilitySystemInterface
 public:
 	ATopDownerCharacter();
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; };
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -44,6 +45,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void EndAiming();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnNextItem();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPrevItem();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Instanced, Category = "Attributes")
 	TObjectPtr<class UBasicCharacterAttributeSet> BasicEntityAttributes;

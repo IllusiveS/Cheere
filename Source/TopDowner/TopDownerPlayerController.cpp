@@ -59,6 +59,7 @@ void ATopDownerPlayerController::SetupInputComponent()
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ATopDownerPlayerController::EndAim);
 
 		EnhancedInputComponent->BindAction(SpecialAction, ETriggerEvent::Triggered, this, &ATopDownerPlayerController::Special);
+		EnhancedInputComponent->BindAction(NextSpecialAction, ETriggerEvent::Triggered, this, &ATopDownerPlayerController::NextSpecial);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ATopDownerPlayerController::Dash);
 	}
 }
@@ -135,6 +136,24 @@ void ATopDownerPlayerController::Move(const FInputActionValue& Value)
 void ATopDownerPlayerController::Special(const FInputActionValue& Value)
 {
 	Cast<ATopDownerCharacter>(GetPawn())->Special(Value);
+}
+
+void ATopDownerPlayerController::NextSpecial(const FInputActionValue& Value)
+{
+	const auto PlayerChar = Cast<ATopDownerCharacter>(GetPawn());
+	if (Value.GetMagnitude() > 0.0)
+	{
+		PlayerChar->OnNextItem();
+	}
+	else if (Value.GetMagnitude() < 0.0)
+	{
+		PlayerChar->OnPrevItem();
+	}
+}
+
+void ATopDownerPlayerController::PrevSpecial(const FInputActionValue& Value)
+{
+	Cast<ATopDownerCharacter>(GetPawn())->OnPrevItem();
 }
 
 void ATopDownerPlayerController::Dash(const FInputActionValue& Value)

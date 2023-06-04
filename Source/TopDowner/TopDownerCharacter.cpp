@@ -67,6 +67,11 @@ ATopDownerCharacter::ATopDownerCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+UAbilitySystemComponent* ATopDownerCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent; 
+}
+
 void ATopDownerCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);

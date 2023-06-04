@@ -64,6 +64,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* SpecialAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* NextSpecialAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* DashAction;
@@ -95,6 +97,10 @@ protected:
 	void Move(const FInputActionValue& Value);
 	UFUNCTION()
 	void Special(const FInputActionValue& Value);
+	UFUNCTION()
+	void NextSpecial(const FInputActionValue& Value);
+	UFUNCTION()
+	void PrevSpecial(const FInputActionValue& Value);
 	UFUNCTION()
 	void Dash(const FInputActionValue& Value);
 	UFUNCTION()

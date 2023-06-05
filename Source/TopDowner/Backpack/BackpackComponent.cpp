@@ -54,15 +54,28 @@ bool UBackpackComponent::CanPickupItem(UBackpackItemAsset* ItemToPickUp) const
 
 void UBackpackComponent::PickupItem(UBackpackItemAsset* ItemToPickUp)
 {
-	auto NewItem = NewObject<UBackpackItem>();
-	NewItem->ItemAsset = ItemToPickUp;
-	NewItem->Amount = 1;
-
-	if (CurrentIndex == -1)
+	const auto Result = Items.FindByPredicate([&ItemToPickUp](const auto& Item)
 	{
-		CurrentIndex = 0;
+		return Item->ItemAsset == ItemToPickUp;
+	});
+	
+	if (Result == nullptr)
+	{
+		auto NewItem = NewObject<UBackpackItem>();
+		NewItem->ItemAsset = ItemToPickUp;
+		NewItem->Amount = 1;
+
+		if (CurrentIndex == -1)
+		{
+			CurrentIndex = 0;
+		}
+		Items.Add(NewItem);
+	} else
+	{
+		const auto ActualResult = *Result;
+		ActualResult->Amount++;
 	}
-	Items.Add(NewItem);
+	
 	PostChangeCurrentItem();
 }
 

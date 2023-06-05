@@ -24,6 +24,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	UStaticMesh* ItemMesh;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FName ItemName;
 };
 
 USTRUCT(BlueprintType)

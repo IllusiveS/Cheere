@@ -15,6 +15,7 @@
 #include "GAS/AttributeSets/BasicCharacterAttributeSet.h"
 #include "GAS/AttributeSets/DodgeAttributeSet.h"
 #include "GAS/AttributeSets/MovementAttributeSet.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ATopDownerCharacter::ATopDownerCharacter()
@@ -62,6 +63,20 @@ ATopDownerCharacter::ATopDownerCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Create a isometric camera boom...
+	IsometricCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("IsometricCameraBoom"));
+	IsometricCameraBoom->SetupAttachment(RootComponent);
+	IsometricCameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
+	IsometricCameraBoom->TargetArmLength = 800.f;
+	IsometricCameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	IsometricCameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	
+	// Create isometric camera
+	IsometricCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("IsometricCamera"));
+	IsometricCameraComponent->SetupAttachment(IsometricCameraBoom, USpringArmComponent::SocketName);
+	IsometricCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -87,6 +102,28 @@ void ATopDownerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		//Setup Fire
 		
+	}
+}
+
+void ATopDownerCharacter::ToggleIsometricCamera()
+{
+	if (GetController()->IsPlayerController())
+	{
+		const auto PC = Cast<APlayerController>(GetController());
+		if (IsCameraIsometric)
+		{
+			IsometricCameraComponent->Deactivate();
+			TopDownCameraComponent->Activate();
+			PC->SetViewTargetWithBlend(this, 0.1);
+			IsCameraIsometric = false;
+		}
+		else
+		{
+			TopDownCameraComponent->Deactivate();
+			IsometricCameraComponent->Activate();
+			PC->SetViewTargetWithBlend(this, 0.1);
+			IsCameraIsometric = true;
+		}
 	}
 }
 
@@ -117,9 +154,14 @@ void ATopDownerCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// add movement 
-		AddMovementInput(FVector(1.0, 0, 0), MovementVector.Y);
-		AddMovementInput(FVector(0.0, 1, 0), MovementVector.X);
+		const auto Camera = GetTopDownCameraComponent();
+		
+		// add movement
+		AddMovementInput(FVector::VectorPlaneProject(
+			Camera->GetForwardVector()
+			, FVector(0.0f, 0.0f, 1.0f)).GetSafeNormal()
+			, MovementVector.Y);
+		AddMovementInput(Camera->GetRightVector(), MovementVector.X);
 	}
 }
 

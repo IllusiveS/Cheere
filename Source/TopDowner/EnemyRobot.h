@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayEffectTypes.h"
+#include "AI/Combat/CombatController.h"
 #include "EnemyRobot.generated.h"
 
 UCLASS()
-class TOPDOWNER_API AEnemyRobot : public ACharacter
+class TOPDOWNER_API AEnemyRobot : public ACharacter, public IAICombatInterface
 {
 	GENERATED_BODY()
 

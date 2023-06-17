@@ -71,8 +71,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	TArray<FItemUIRepresentation> GetUiInfo() const;
-	
+
+	UPROPERTY(VisibleAnywhere)
 	TArray<class UBackpackItem*> Items;
+
+	UPROPERTY(VisibleAnywhere)
 	int CurrentIndex {-1};
 
 	UPROPERTY(BlueprintAssignable)

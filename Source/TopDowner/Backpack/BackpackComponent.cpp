@@ -84,17 +84,24 @@ void UBackpackComponent::RemoveCurrentItem()
 	if (Items[CurrentIndex]->Amount == 1)
 	{
 		Items.RemoveAt(CurrentIndex);
+		CurrentIndex = CurrentIndex == 0 ? 0 : CurrentIndex - 1;
 	} else
 	{
 		Items[CurrentIndex]->Amount--;
 	}
+	if(Items.Num() == 0) CurrentIndex = -1;
 	PostChangeCurrentItem();
 }
 
 UBackpackItem* UBackpackComponent::GetCurrentItem()
 {
 	if (Items.IsEmpty()) return nullptr;
-
+	if (CurrentIndex >= Items.Num())
+	{
+		CurrentIndex = -1;
+		return nullptr;
+	}
+	
 	return Items[CurrentIndex];
 }
 

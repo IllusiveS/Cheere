@@ -14,8 +14,6 @@ USpawnEnemiesNode::USpawnEnemiesNode()
 	NodeStyle = EFlowNodeStyle::Latent;
 #endif
 
-	InputPins.Add(FFlowPin(TEXT("Start")));
-
 	OutputPins.Empty();
 	OutputPins.Add(FFlowPin(TEXT("StartedSpawn")));
 	OutputPins.Add(FFlowPin(TEXT("FinishedSpawn")));

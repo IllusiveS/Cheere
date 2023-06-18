@@ -212,6 +212,7 @@ void ATopDownerCharacter::Dash(const FInputActionValue& Value)
 	OnDash();
 }
 
+
 void ATopDownerCharacter::Aim(const FInputActionValue& Value)
 {
 	// We look for the location in the world where the player has pressed the input
@@ -219,7 +220,7 @@ void ATopDownerCharacter::Aim(const FInputActionValue& Value)
 	bool bHitSuccessful = false;
 	
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	bHitSuccessful = PC->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
+	bHitSuccessful = PC->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, true, Hit);
 
 	// If we hit a surface, cache the location
 	if (bHitSuccessful == false)

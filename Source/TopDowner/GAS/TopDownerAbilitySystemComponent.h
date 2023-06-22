@@ -28,7 +28,7 @@ public:
 	TArray<TSubclassOf<class UTopDownerGameplayEffect>> DefaultEffects;
 
 	UFUNCTION(BlueprintCallable)
-	void RunEvent(FGameplayTag EventTag, const FGameplayEventData Payload);
+	int RunEvent(FGameplayTag EventTag, const FGameplayEventData Payload);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool HasTag(FGameplayTag TagToCheck);

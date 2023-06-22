@@ -38,9 +38,9 @@ void UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTo
 	}
 }
 
-void UTopDownerAbilitySystemComponent::RunEvent(FGameplayTag EventTag, const FGameplayEventData Payload)
+int UTopDownerAbilitySystemComponent::RunEvent(FGameplayTag EventTag, const FGameplayEventData Payload)
 {
-	HandleGameplayEvent(EventTag, &Payload);
+	return HandleGameplayEvent(EventTag, &Payload);
 }
 
 bool UTopDownerAbilitySystemComponent::HasTag(FGameplayTag TagToCheck)

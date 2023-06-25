@@ -2,6 +2,8 @@
 
 #include "TopDownerCharacter.h"
 
+#include <string>
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Backpack/BackpackComponent.h"
@@ -50,14 +52,18 @@ ATopDownerCharacter::ATopDownerCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
+	CameraBoomParent = CreateDefaultSubobject<USceneComponent>(TEXT("CameraParent"));
+	CameraBoomParent->SetupAttachment(GetRootComponent());
+	
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->SetupAttachment(CameraBoomParent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
+	
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -90,6 +96,11 @@ UAbilitySystemComponent* ATopDownerCharacter::GetAbilitySystemComponent() const
 void ATopDownerCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+	//
+	// if(GEngine)
+	// 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DeltaSeconds * 35.0));	
+	
+	GetTopDownCameraComponent()->SetFieldOfView(FMath::Lerp(GetTopDownCameraComponent()->FieldOfView, TargetFov, DeltaSeconds * 5.0));
 }
 
 void ATopDownerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -179,6 +190,9 @@ void ATopDownerCharacter::BeginAim(const FInputActionValue& Value)
 		Subsystem->AddMappingContext(FiringMappingContext, 0);
 	}
 
+	SetActorRotation(FRotator());
+	TargetFov = AimingFov;
+	
 	BeginAiming();
 }
 
@@ -192,8 +206,12 @@ void ATopDownerCharacter::EndAim(const FInputActionValue& Value)
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 	{
 		Subsystem->RemoveMappingContext(FiringMappingContext);
-		//Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	}
+
+	TargetFov = RunningFov;
+
+	GetMesh()->SetRelativeRotation(FRotator(0.0, -90.0, 0.0));
+	
 	EndAiming();
 }
 
@@ -229,5 +247,6 @@ void ATopDownerCharacter::Aim(const FInputActionValue& Value)
 	}
 	Hit.Location.Z = GetActorLocation().Z;
 	auto rotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Hit.Location);
-	SetActorRotation(rotator);
+	rotator.Yaw -= 90;
+	GetMesh()->SetWorldRotation(rotator);
 }

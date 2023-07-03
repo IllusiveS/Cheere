@@ -83,10 +83,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "BlueprintHeaderView",
-			"Enabled": false
-		},
-		{
 			"Name": "XGEController",
 			"Enabled": false
 		},

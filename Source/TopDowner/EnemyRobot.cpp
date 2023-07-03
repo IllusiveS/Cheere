@@ -27,8 +27,7 @@ AEnemyRobot::AEnemyRobot()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetGroundFrictionAttribute())
 		.AddUObject(this, &AEnemyRobot::GroundFrictionChanged);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetBrakingDecelerationWalkingAttribute())
-    	.AddUObject(this, &AEnemyRobot::BrakingDecelerationWalkingChanged);
-    		
+    	.AddUObject(this, &AEnemyRobot::BrakingDecelerationWalkingChanged);	
 }
 
 void AEnemyRobot::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const

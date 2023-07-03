@@ -48,6 +48,12 @@ public:
 	UPROPERTY(Category=Abilities, VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UTopDownerAbilitySystemComponent> AbilitySystemComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class AEnemyGroup> GroupImAPartOf;
+	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FVector LastDmgDir;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int UnitGroupCost {1};
 };

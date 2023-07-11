@@ -22,6 +22,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateUnitCosts();
 
+	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 	virtual void Tick(float DeltaSeconds) override;
 public:
 	/** Please add a variable description */
@@ -30,29 +32,52 @@ public:
 
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Default")
-	TObjectPtr<class UStaticMeshComponent> StaticMesh;
-
-	/** Please add a variable description */
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category="Default")
 	TObjectPtr<class USceneComponent> DefaultSceneRoot;
 
 	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category="Default")
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category="Group")
 	TArray<class AEnemyRobot*> EnemiesInRange;
 
 	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Group")
 	int32 CostOfUnits {0};
 
 	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Group")
 	int32 MaxCostOfUnits {4};
 
 	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly,  Category="Group")
 	bool IsBeingMerged {false};
 
+	/** Please add a variable description */
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly,  Category="Group")
+	bool IsActivated {false};
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateGroup();
+	UFUNCTION(BlueprintCallable)
+	void SetGroupTarget(FVector target);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanJoinGroup(class AEnemyRobot* Enemy);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CanBeMerged();
+
+	UFUNCTION(BlueprintCallable)
+	void OrderNeedlessUnitsOutOfGroup();
+	UFUNCTION(BlueprintCallable)
+	void AllowRemovalOfNeedlessUnits();
+	
 protected:
+	UPROPERTY()
+	bool isRemovingNeedlessUnit {false};
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FVector OrderedPosition;
+	
+	UFUNCTION()
+	void ReactToEnemyDead(class AEnemyRobot* Enemy);
+	
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent
 		, AActor* OtherActor

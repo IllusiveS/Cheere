@@ -22,5 +22,6 @@ public:
 	FString SaveSlotName;
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
-	TSubclassOf<UBehaviorTree> CombatTree;
+	TSoftObjectPtr<UBehaviorTree> CombatTree;
+;
 };

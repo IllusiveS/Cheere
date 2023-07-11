@@ -2,6 +2,8 @@
 
 
 #include "EnemyGroup.h"
+
+#include "Combat/CombatControllerSubsystem.h"
 #include "Components/SphereComponent.h"
 #include "TopDowner/EnemyRobot.h"
 
@@ -14,18 +16,22 @@ AEnemyGroup::AEnemyGroup()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = DefaultSceneRoot;
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DebugMesh"));
-	StaticMesh->SetupAttachment(RootComponent);
-
 	Detection = CreateDefaultSubobject<USphereComponent>(TEXT("DetectionSphere"));
 	Detection->SetupAttachment(RootComponent);
 	Detection->OnComponentBeginOverlap.AddDynamic(this, &AEnemyGroup::OnBeginOverlap);
 	Detection->OnComponentEndOverlap.AddDynamic(this, &AEnemyGroup::OnEndOverlap);
+	Detection->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Detection->SetCollisionObjectType(ECC_GameTraceChannel4);
+	Detection->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Detection->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Overlap);
+	Detection->InitSphereRadius(1000.0);
+	Detection->SetGenerateOverlapEvents(true);
+	Detection->SetHiddenInGame(false);
 }
 
 void AEnemyGroup::MergeAnotherGroup(AEnemyGroup* GroupToMergeIn)
 {
-	IsBeingMerged = true;
+	GroupToMergeIn->IsBeingMerged = true;
 
 	for(const auto Enemy : EnemiesInRange)
 	{
@@ -46,23 +52,112 @@ void AEnemyGroup::UpdateUnitCosts()
 	CostOfUnits = Cost;
 }
 
+void AEnemyGroup::BeginPlay()
+{
+	Super::BeginPlay();
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(GetWorld()))
+	{
+		CombatController->AddGroupToCombat(this);
+	}
+}
+
+void AEnemyGroup::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	for (auto enemy : EnemiesInRange)
+	{
+		enemy->GroupImAPartOf == nullptr;
+	}
+	
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(GetWorld()))
+	{
+		CombatController->RemoveGroupFromCombat(this);
+	}
+}
+
 void AEnemyGroup::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	FVector DesiredPosition;
+	FVector DesiredPosition{0.0f};
 
+	if (EnemiesInRange.IsEmpty()) return;
+	
 	for(const auto Enemy : EnemiesInRange)
 	{
 		const auto EnemyPos = Enemy->GetActorLocation();
 		DesiredPosition += EnemyPos;
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), EnemyPos, 5.0, FColor::Red, false);
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), EnemyPos, 5.0, FColor::Red, false, -1, SDPG_World, 5.0);
 	}
 
 	DesiredPosition /= EnemiesInRange.Num();
 
 	SetActorLocation(
 		FMath::Lerp(GetActorLocation(), DesiredPosition, DeltaSeconds * 15.0));
+
+	if(OrderedPosition.Length() > 1.0)
+	{
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), OrderedPosition, 15.0, FColor::Blue, false, -1, SDPG_World, 7.0);
+	}
+
+	EnemiesInRange = EnemiesInRange.FilterByPredicate([this](auto Enemy){ return Enemy->GroupImAPartOf == this;});
+}
+
+void AEnemyGroup::ActivateGroup()
+{
+	IsActivated = true;
+	for(const auto Enemy : EnemiesInRange)
+	{
+		IAICombatInterface::Execute_ActivateLow(Enemy);
+	}
+}
+
+void AEnemyGroup::SetGroupTarget(FVector target)
+{
+	for(const auto Enemy : EnemiesInRange)
+	{
+		Enemy->SetTargetPosition(target);
+	}
+	OrderedPosition = target;
+	UE_LOG(LogTemp, Warning, TEXT("Setting target to %s"), *target.ToString());
+}
+
+bool AEnemyGroup::CanJoinGroup(AEnemyRobot* Enemy)
+{
+	if (Enemy->GroupImAPartOf->IsValidLowLevel()) return false;
+	return (CostOfUnits + Enemy->UnitGroupCost) < MaxCostOfUnits;
+}
+
+bool AEnemyGroup::CanBeMerged()
+{
+	return (CostOfUnits < MaxCostOfUnits);
+}
+
+void AEnemyGroup::OrderNeedlessUnitsOutOfGroup()
+{
+	if (isRemovingNeedlessUnit) return;
+	EnemiesInRange.Sort([](auto& Enemy1, auto& Enemy2)
+	{
+		return Enemy1.UnitGroupCost < Enemy2.UnitGroupCost;
+	});
+	EnemiesInRange[0]->GoAway();
+
+	isRemovingNeedlessUnit = true;
+	
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &AEnemyGroup::AllowRemovalOfNeedlessUnits, 2, false);
+}
+
+void AEnemyGroup::ReactToEnemyDead(AEnemyRobot* Enemy)
+{
+	EnemiesInRange.Remove(Enemy);
+	if(EnemiesInRange.IsEmpty()) Destroy();
+}
+
+void AEnemyGroup::AllowRemovalOfNeedlessUnits()
+{
+	isRemovingNeedlessUnit = false;	
 }
 
 void AEnemyGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -70,20 +165,30 @@ void AEnemyGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (auto Enemy = Cast<AEnemyRobot>(OtherActor))
 	{
+		if (CanJoinGroup(Enemy) == false) return;
+		if (Enemy->GroupImAPartOf != nullptr)
+		{
+			Enemy->GroupImAPartOf->EnemiesInRange.Remove(Enemy);
+		}
 		EnemiesInRange.AddUnique(Enemy);
 		Enemy->GroupImAPartOf = this;
-
-		//TODO bind on dead
+		Enemy->OnEnemyDead.AddUniqueDynamic(this, &AEnemyGroup::ReactToEnemyDead);
+		
 		UpdateUnitCosts();
-	}
 
-	if (auto OtherGroup = Cast<AEnemyGroup>(OtherActor))
-	{
-		if (IsBeingMerged == false)
+		if(CostOfUnits > MaxCostOfUnits)
 		{
-			MergeAnotherGroup(OtherGroup);
+			OrderNeedlessUnitsOutOfGroup();
 		}
 	}
+
+	// if (auto OtherGroup = Cast<AEnemyGroup>(OtherActor))
+	// {
+	// 	if (IsBeingMerged == false && CanBeMerged() && OtherGroup->CanBeMerged())
+	// 	{
+	// 		MergeAnotherGroup(OtherGroup);
+	// 	}
+	// }
 }
 
 void AEnemyGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -91,9 +196,10 @@ void AEnemyGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	if (auto Enemy = Cast<AEnemyRobot>(OtherActor))
 	{
-		EnemiesInRange.Remove(Enemy);
-		Enemy->GroupImAPartOf = nullptr;
-		
-		UpdateUnitCosts();
+		// EnemiesInRange.Remove(Enemy);
+		// Enemy->OnEnemyDead.RemoveDynamic(this, &AEnemyGroup::ReactToEnemyDead);
+		// Enemy->GroupImAPartOf = nullptr;
+		//
+		// UpdateUnitCosts();
 	}
 }

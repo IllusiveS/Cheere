@@ -6,6 +6,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "TopDownerGameplayAbility.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameplayAbilityEnded);
+
 /**
  * 
  */
@@ -13,5 +15,9 @@ UCLASS()
 class TOPDOWNER_API UTopDownerGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintAssignable)
+	FGameplayAbilityEnded OnAbilityEnded;
 	
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 };

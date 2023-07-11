@@ -3,6 +3,7 @@
 
 #include "EnemyRobot.h"
 
+#include "AI/EnemyGroup.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TopDownerAbilitySystemComponent.h"
 #include "GAS/AttributeSets/BasicCharacterAttributeSet.h"
@@ -67,7 +68,10 @@ void AEnemyRobot::BrakingDecelerationWalkingChanged(const FOnAttributeChangeData
 void AEnemyRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (GroupImAPartOf->IsValidLowLevel() == false)
+	{
+		GroupImAPartOf = nullptr;
+	}
 }
 
 // Called to bind functionality to input
@@ -77,3 +81,9 @@ void AEnemyRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+void AEnemyRobot::ChangeGroup(AEnemyGroup* Group)
+{
+	//if (GroupImAPartOf)
+	
+	GroupImAPartOf = Group;
+}

@@ -22,8 +22,14 @@ public:
 	class UBehaviorTree* CombatTree;
 	
 	UPROPERTY(BlueprintReadOnly)
-	ACombatController* CombatController;
+	TObjectPtr<ACombatController> CombatController;
 
+	UFUNCTION()
+	void StartCombat();
+
+	UFUNCTION()
+	void EndCombat();
+	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 };
 

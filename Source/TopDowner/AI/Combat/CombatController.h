@@ -43,6 +43,17 @@ public:
 	void EndCombat();
 
 	UFUNCTION(BlueprintCallable)
+	void AddGroupToCombat(class AEnemyGroup* NewRobot);
+	UFUNCTION(BlueprintCallable)
+	void RemoveGroupFromCombat(class AEnemyGroup* NewRobot);
+
+	UFUNCTION(BlueprintPure)
+	AEnemyGroup* GetUnactivatedGroup();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyGroup* FindNearestAcceptableGroup(class AEnemyRobot* Enemy);
+	
+	UFUNCTION(BlueprintCallable)
 	void AddEnemyToCombat(class AEnemyRobot* NewRobot);
 	UFUNCTION(BlueprintCallable)
 	void AddRequiredEnemyToCombat(class AEnemyRobot* NewRobot);
@@ -50,6 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveEnemyFromCombat(class AEnemyRobot* NewRobot);
 
+	virtual void Tick(float DeltaSeconds) override;
 	
 	// UFUNCTION(BlueprintCallable)
 	// void ActivateEnemyHigh();
@@ -65,6 +77,9 @@ protected:
 
 	UPROPERTY()
 	UBehaviorTree* CombatTree;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<class AEnemyGroup *> GroupsInCombat;
 	
 	UPROPERTY()
 	TArray<class AEnemyRobot*> AllEnemiesInCombat;

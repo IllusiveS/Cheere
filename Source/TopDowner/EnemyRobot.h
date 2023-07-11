@@ -8,6 +8,8 @@
 #include "AI/Combat/CombatController.h"
 #include "EnemyRobot.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyRobotDelegate, AEnemyRobot*, Robot);
+
 UCLASS()
 class TOPDOWNER_API AEnemyRobot : public ACharacter, public IAICombatInterface
 {
@@ -48,12 +50,27 @@ public:
 	UPROPERTY(Category=Abilities, VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UTopDownerAbilitySystemComponent> AbilitySystemComponent;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<class AEnemyGroup> GroupImAPartOf;
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeGroup(class AEnemyGroup* Group);
 	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FVector LastDmgDir;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int UnitGroupCost {1};
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEnemyRobotDelegate OnEnemyDead;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetTargetPosition(FVector targetPos);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void GoAway();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UEnvQuery* SetGroupTargetQuery;
 };

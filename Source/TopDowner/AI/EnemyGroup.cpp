@@ -33,7 +33,7 @@ void AEnemyGroup::MergeAnotherGroup(AEnemyGroup* GroupToMergeIn)
 {
 	GroupToMergeIn->IsBeingMerged = true;
 
-	for(const auto Enemy : EnemiesInRange)
+	for(const auto Enemy : GroupToMergeIn->EnemiesInRange)
 	{
 		Enemy->GroupImAPartOf = this;
 	}
@@ -129,9 +129,9 @@ bool AEnemyGroup::CanJoinGroup(AEnemyRobot* Enemy)
 	return (CostOfUnits + Enemy->UnitGroupCost) < MaxCostOfUnits;
 }
 
-bool AEnemyGroup::CanBeMerged()
+bool AEnemyGroup::CanBeMerged(AEnemyGroup* OtherGroup)
 {
-	return (CostOfUnits < MaxCostOfUnits);
+	return ((OtherGroup->CostOfUnits + CostOfUnits) < MaxCostOfUnits);
 }
 
 void AEnemyGroup::OrderNeedlessUnitsOutOfGroup()
@@ -182,13 +182,14 @@ void AEnemyGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		}
 	}
 
-	// if (auto OtherGroup = Cast<AEnemyGroup>(OtherActor))
-	// {
-	// 	if (IsBeingMerged == false && CanBeMerged() && OtherGroup->CanBeMerged())
-	// 	{
-	// 		MergeAnotherGroup(OtherGroup);
-	// 	}
-	// }
+	if (auto OtherGroup = Cast<AEnemyGroup>(OtherActor))
+	{
+		if (OtherGroup == this) return;
+		if (IsBeingMerged == false && CanBeMerged(OtherGroup) && OtherGroup->CanBeMerged(this))
+		{
+			MergeAnotherGroup(OtherGroup);
+		}
+	}
 }
 
 void AEnemyGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

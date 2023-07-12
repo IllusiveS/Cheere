@@ -20,11 +20,13 @@ void ACombatController::EndCombat()
 void ACombatController::AddGroupToCombat(AEnemyGroup* NewGroup)
 {
 	GroupsInCombat.Add(NewGroup);
+	BoredGroups.Add(NewGroup);
 }
 
 void ACombatController::RemoveGroupFromCombat(AEnemyGroup* GroupToRemove)
 {
 	GroupsInCombat.Remove(GroupToRemove);
+	BoredGroups.Remove(GroupToRemove);
 }
 
 AEnemyGroup* ACombatController::GetUnactivatedGroup()
@@ -46,6 +48,31 @@ AEnemyGroup* ACombatController::GetUnactivatedGroup()
 		}
 	}
 	return GroupToReturn;
+}
+
+AEnemyGroup* ACombatController::GetBoredGroup()
+{
+	AEnemyGroup* GroupToReturn = nullptr;
+
+	BoredGroups = BoredGroups.FilterByPredicate([](auto Group){ return Group != nullptr && !Group->IsActivated;});
+	if (BoredGroups.IsEmpty()) return nullptr;
+	
+	const auto RandomIndex = FMath::RandRange(0, BoredGroups.Num() - 1);
+
+	auto Group = BoredGroups[RandomIndex];
+
+	FTimerHandle TimerHandle_AttackDelay;
+	FTimerDelegate Delegate; // Delegate to bind function with parameters
+	Delegate.BindUFunction(this, "TimerOnBoredomEnded", Group);
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_AttackDelay, Delegate, FMath::FRandRange(3.0, 6.0), false);
+	
+	return Group;
+}
+
+void ACombatController::TimerOnBoredomEnded(AEnemyGroup* Group)
+{
+	BoredGroups.Add(Group);
 }
 
 AEnemyGroup* ACombatController::FindNearestAcceptableGroup(AEnemyRobot* Enemy)
@@ -92,6 +119,7 @@ void ACombatController::Tick(float DeltaSeconds)
 
 	if (const auto bb = GetBlackboardComponent())
 	{
+		GroupsInCombat = GroupsInCombat.FilterByPredicate([](auto Group) { return Group != nullptr; });
 		bb->SetValueAsInt("ActiveGroups", Algo::Accumulate(GroupsInCombat, 0, [](auto val, auto Group){ return val + Group->IsActivated ? 1 : 0; }));
 	}
 }

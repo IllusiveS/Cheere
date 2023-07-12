@@ -49,6 +49,11 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	AEnemyGroup* GetUnactivatedGroup();
+
+	UFUNCTION(BlueprintPure)
+	AEnemyGroup* GetBoredGroup();
+	UFUNCTION()
+	void TimerOnBoredomEnded(class AEnemyGroup* Group);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyGroup* FindNearestAcceptableGroup(class AEnemyRobot* Enemy);
@@ -80,6 +85,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<class AEnemyGroup *> GroupsInCombat;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<class AEnemyGroup *> BoredGroups;
 	
 	UPROPERTY()
 	TArray<class AEnemyRobot*> AllEnemiesInCombat;

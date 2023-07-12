@@ -61,7 +61,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CanJoinGroup(class AEnemyRobot* Enemy);
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool CanBeMerged();
+	bool CanBeMerged(class AEnemyGroup* OtherGroup);
 
 	UFUNCTION(BlueprintCallable)
 	void OrderNeedlessUnitsOutOfGroup();

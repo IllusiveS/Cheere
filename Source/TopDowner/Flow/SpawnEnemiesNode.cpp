@@ -5,7 +5,9 @@
 
 #include "FlowComponent.h"
 #include "FlowSubsystem.h"
+#include "Algo/Accumulate.h"
 #include "TopDowner/EnemyRobot.h"
+#include "TopDowner/TopDowner.h"
 
 USpawnEnemiesNode::USpawnEnemiesNode()
 {
@@ -28,6 +30,12 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 	{
 		auto Components = FlowSubsystem->GetComponents<UFlowComponent>(SpawnerIdentityTags, MatchType, true).Array();
 
+		if (Components.IsEmpty())
+		{
+			UE_LOG(LogTopDowner, Log, TEXT("Did not found spawners with desired tag %s"), *SpawnerIdentityTags.ToString());
+			return;
+		}
+		
 		auto WholeSpawnNumber = 0;
 
 		auto FinishSpawnFunction = [this](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
@@ -47,6 +55,17 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 			}
 			IEnemySpawnerInterface::Execute_SetEnemyToSpawn(Spawner, EnemyToSpawn);
 		};
+
+		auto NumberOfEnemies = Algo::Accumulate(EnemiesToSpawn, 0, [](auto Acc, auto&& pair)
+		{
+			return pair.Value + Acc;
+		});
+	
+		if (NumberOfEnemies > Components.Num())
+		{
+			UE_LOG(LogTopDowner, Log, TEXT("Not enough spawners found, spawn less enemies or put in more spawners."));
+			return;
+		}	
 		
 		for (const TPair<TSubclassOf<class AEnemyRobot>, int> &pair : EnemiesToSpawn)
 		{

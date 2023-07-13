@@ -9,5 +9,5 @@ void UTopDownerGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Hand
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	OnAbilityEnded.Broadcast();
+	OnAbilityEnded.Broadcast(bWasCancelled);
 }

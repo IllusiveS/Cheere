@@ -71,6 +71,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void GoAway();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool IsDead{false};
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UEnvQuery* SetGroupTargetQuery;
 };

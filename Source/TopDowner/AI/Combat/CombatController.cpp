@@ -32,7 +32,7 @@ void ACombatController::RemoveGroupFromCombat(AEnemyGroup* GroupToRemove)
 AEnemyGroup* ACombatController::GetUnactivatedGroup()
 {
 	AEnemyGroup* GroupToReturn = nullptr;
-
+	
 	GroupsInCombat.Sort([](auto& Enemy1, auto& Enemy2)
 	{
 		return Enemy1.CostOfUnits > Enemy2.CostOfUnits;

@@ -21,6 +21,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FAsyncTaskGameplayAbilityEndedEv OnEnded;
 
+	UPROPERTY(BlueprintAssignable)
+	FAsyncTaskGameplayAbilityEndedEv OnEndedFail;
+
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true"))
 	static UAsyncTaskGameplayAbilityEnded* ListenForGameplayAbilityEnd(UAbilitySystemComponent* abilitySystemComponent, TSubclassOf<UGameplayAbility> abilityClass);
 
@@ -43,5 +46,5 @@ protected:
 	TMap<FGameplayTag, FDelegateHandle> HandlesMap;
 
 	UFUNCTION()
-	virtual void OnCallback();
+	virtual void OnCallback(bool bWasCancelled);
 };

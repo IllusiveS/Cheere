@@ -91,8 +91,14 @@ void UAsyncTaskGameplayAbilityEnded::EndTask()
 	MarkAsGarbage();
 }
 
-void UAsyncTaskGameplayAbilityEnded::OnCallback()
+void UAsyncTaskGameplayAbilityEnded::OnCallback(bool bWasCancelled)
 {
-	OnEnded.Broadcast();
+	if (bWasCancelled)
+	{
+		OnEndedFail.Broadcast();
+	} else
+	{
+		OnEnded.Broadcast();
+	}
 	AbilityListeningTo->OnAbilityEnded.RemoveDynamic(this, &UAsyncTaskGameplayAbilityEnded::OnCallback);
 }

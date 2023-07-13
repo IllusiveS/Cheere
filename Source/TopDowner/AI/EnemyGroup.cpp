@@ -126,6 +126,7 @@ void AEnemyGroup::SetGroupTarget(FVector target)
 bool AEnemyGroup::CanJoinGroup(AEnemyRobot* Enemy)
 {
 	if (Enemy->GroupImAPartOf->IsValidLowLevel()) return false;
+	UpdateUnitCosts();
 	return (CostOfUnits + Enemy->UnitGroupCost) < MaxCostOfUnits;
 }
 
@@ -142,6 +143,7 @@ void AEnemyGroup::OrderNeedlessUnitsOutOfGroup()
 		return Enemy1.UnitGroupCost < Enemy2.UnitGroupCost;
 	});
 	EnemiesInRange[0]->GoAway();
+	EnemiesInRange.RemoveAt(0);
 
 	isRemovingNeedlessUnit = true;
 	
@@ -152,7 +154,7 @@ void AEnemyGroup::OrderNeedlessUnitsOutOfGroup()
 void AEnemyGroup::ReactToEnemyDead(AEnemyRobot* Enemy)
 {
 	EnemiesInRange.Remove(Enemy);
-	if(EnemiesInRange.IsEmpty()) Destroy();
+	if(EnemiesInRange.Num() < 1) Destroy();
 }
 
 void AEnemyGroup::AllowRemovalOfNeedlessUnits()
@@ -165,6 +167,7 @@ void AEnemyGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (auto Enemy = Cast<AEnemyRobot>(OtherActor))
 	{
+		if (Enemy->IsDead) return;
 		if (CanJoinGroup(Enemy) == false) return;
 		if (Enemy->GroupImAPartOf != nullptr)
 		{

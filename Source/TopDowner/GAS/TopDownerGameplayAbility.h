@@ -6,7 +6,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "TopDownerGameplayAbility.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameplayAbilityEnded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameplayAbilityEnded, bool, WasCancelled);
 
 /**
  * 

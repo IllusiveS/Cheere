@@ -26,7 +26,7 @@ AEnemyGroup::AEnemyGroup()
 	Detection->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Overlap);
 	Detection->InitSphereRadius(1000.0);
 	Detection->SetGenerateOverlapEvents(true);
-	Detection->SetHiddenInGame(false);
+	Detection->SetHiddenInGame(true);
 }
 
 void AEnemyGroup::MergeAnotherGroup(AEnemyGroup* GroupToMergeIn)
@@ -88,7 +88,7 @@ void AEnemyGroup::Tick(float DeltaSeconds)
 	{
 		const auto EnemyPos = Enemy->GetActorLocation();
 		DesiredPosition += EnemyPos;
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), EnemyPos, 5.0, FColor::Red, false, -1, SDPG_World, 5.0);
+		//DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), EnemyPos, 5.0, FColor::Red, false, -1, SDPG_World, 5.0);
 	}
 
 	DesiredPosition /= EnemiesInRange.Num();
@@ -98,7 +98,7 @@ void AEnemyGroup::Tick(float DeltaSeconds)
 
 	if(OrderedPosition.Length() > 1.0)
 	{
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), OrderedPosition, 15.0, FColor::Blue, false, -1, SDPG_World, 7.0);
+		//DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), OrderedPosition, 15.0, FColor::Blue, false, -1, SDPG_World, 7.0);
 	}
 
 	EnemiesInRange = EnemiesInRange.FilterByPredicate([this](auto Enemy){ return Enemy->GroupImAPartOf == this;});

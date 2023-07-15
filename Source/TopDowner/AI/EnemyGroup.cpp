@@ -127,12 +127,14 @@ bool AEnemyGroup::CanJoinGroup(AEnemyRobot* Enemy)
 {
 	if (Enemy->GroupImAPartOf->IsValidLowLevel()) return false;
 	UpdateUnitCosts();
-	return (CostOfUnits + Enemy->UnitGroupCost) < MaxCostOfUnits;
+	return (CostOfUnits + Enemy->UnitGroupCost) <= MaxCostOfUnits;
 }
 
 bool AEnemyGroup::CanBeMerged(AEnemyGroup* OtherGroup)
 {
-	return ((OtherGroup->CostOfUnits + CostOfUnits) < MaxCostOfUnits);
+	UpdateUnitCosts();
+	OtherGroup->UpdateUnitCosts();
+	return ((OtherGroup->CostOfUnits + CostOfUnits) <= MaxCostOfUnits);
 }
 
 void AEnemyGroup::OrderNeedlessUnitsOutOfGroup()
@@ -149,6 +151,8 @@ void AEnemyGroup::OrderNeedlessUnitsOutOfGroup()
 	
 	FTimerHandle handle;
 	GetWorld()->GetTimerManager().SetTimer(handle, this, &AEnemyGroup::AllowRemovalOfNeedlessUnits, 2, false);
+
+	UpdateUnitCosts();
 }
 
 void AEnemyGroup::ReactToEnemyDead(AEnemyRobot* Enemy)

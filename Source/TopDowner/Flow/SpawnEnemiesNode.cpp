@@ -30,73 +30,74 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 	{
 		auto Components = FlowSubsystem->GetComponents<UFlowComponent>(SpawnerIdentityTags, MatchType, true).Array();
 
-		if (Components.IsEmpty())
+		if (!Components.IsEmpty())
 		{
-			UE_LOG(LogTopDowner, Log, TEXT("Did not found spawners with desired tag %s"), *SpawnerIdentityTags.ToString());
-			return;
-		}
-		
-		auto WholeSpawnNumber = 0;
+			auto WholeSpawnNumber = 0;
 
-		auto FinishSpawnFunction = [this](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
-		{
-			
-			auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
-							,&target->GetOwner()->GetTransform());
-
-			if(EffectToGive->IsValidLowLevel())
+			auto FinishSpawnFunction = [this](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
 			{
-				IEnemySpawnerInterface::Execute_SetUniqueEffect(Spawner, EffectToGive);
-			}
+				auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
+								,&target->GetOwner()->GetTransform());
 
-			if(FlowTagsToGive.IsEmpty() == false)
+				if(EffectToGive->IsValidLowLevel())
+				{
+					IEnemySpawnerInterface::Execute_SetUniqueEffect(Spawner, EffectToGive);
+				}
+
+				if(FlowTagsToGive.IsEmpty() == false)
+				{
+					IEnemySpawnerInterface::Execute_SetUniqueFlowTag(Spawner, FlowTagsToGive);
+				}
+				IEnemySpawnerInterface::Execute_SetEnemyToSpawn(Spawner, EnemyToSpawn);
+			};
+
+			auto NumberOfEnemies = Algo::Accumulate(EnemiesToSpawn, 0, [](auto Acc, auto&& pair)
 			{
-				IEnemySpawnerInterface::Execute_SetUniqueFlowTag(Spawner, FlowTagsToGive);
-			}
-			IEnemySpawnerInterface::Execute_SetEnemyToSpawn(Spawner, EnemyToSpawn);
-		};
-
-		auto NumberOfEnemies = Algo::Accumulate(EnemiesToSpawn, 0, [](auto Acc, auto&& pair)
-		{
-			return pair.Value + Acc;
-		});
+				return pair.Value + Acc;
+			});
 	
-		if (NumberOfEnemies > Components.Num())
-		{
-			UE_LOG(LogTopDowner, Log, TEXT("Not enough spawners found, spawn less enemies or put in more spawners."));
-			return;
-		}	
-		
-		for (const TPair<TSubclassOf<class AEnemyRobot>, int> &pair : EnemiesToSpawn)
-		{
-			for (int i = 0; i < pair.Value; i++)
+			if (NumberOfEnemies <= Components.Num())
 			{
-				WholeSpawnNumber += 1;
-				const auto RandIndex = FMath::RandRange(0, Components.Num() - 1);
-				auto target = Components[RandIndex];
+				for (const TPair<TSubclassOf<class AEnemyRobot>, int> &pair : EnemiesToSpawn)
+				{
+					for (int i = 0; i < pair.Value; i++)
+					{
+						WholeSpawnNumber += 1;
+						const auto RandIndex = FMath::RandRange(0, Components.Num() - 1);
+						auto target = Components[RandIndex];
 
-				FActorSpawnParameters params;
+						FActorSpawnParameters params;
+
+						if (DelayBetweenSpawns != 0.0)
+						{
+							FTimerHandle handle;
+							target->GetOwner()->GetWorld()->GetTimerManager().SetTimer(handle, [=]()
+							{
+								FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
+							}, (WholeSpawnNumber + 1) * DelayBetweenSpawns, false);
+						} else
+						{
+							FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
+						}
+			
+						Components.RemoveAt(RandIndex);
+					}
+				}
 
 				if (DelayBetweenSpawns != 0.0)
 				{
 					FTimerHandle handle;
-					target->GetOwner()->GetWorld()->GetTimerManager().SetTimer(handle, [=]()
-					{
-						FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
-					}, (WholeSpawnNumber + 1) * DelayBetweenSpawns, false);
-				} else
-				{
-					FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
+					GetWorld()->GetTimerManager().SetTimer(handle, this, &USpawnEnemiesNode::FinishSpawning, WholeSpawnNumber * DelayBetweenSpawns, false);
 				}
-			
-				Components.RemoveAt(RandIndex);
+			} else
+			{
+				UE_LOG(LogTopDowner, Log, TEXT("Not enough spawners found, spawn less enemies or put in more spawners."));
+				FinishSpawning();
 			}
-		}
-
-		if (DelayBetweenSpawns != 0.0)
+		} else
 		{
-			FTimerHandle handle;
-			GetWorld()->GetTimerManager().SetTimer(handle, this, &USpawnEnemiesNode::FinishSpawning, WholeSpawnNumber * DelayBetweenSpawns, false);
+			UE_LOG(LogTopDowner, Log, TEXT("Did not found spawners with desired tag %s"), *SpawnerIdentityTags.ToString());
+			FinishSpawning();
 		}
 	}
 

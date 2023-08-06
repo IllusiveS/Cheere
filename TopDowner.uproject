@@ -93,6 +93,10 @@
 		{
 			"Name": "AppleImageUtils",
 			"Enabled": false
+		},
+		{
+			"Name": "MotionWarping",
+			"Enabled": true
 		}
 	]
 }

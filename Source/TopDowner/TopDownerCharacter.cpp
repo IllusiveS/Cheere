@@ -100,7 +100,7 @@ void ATopDownerCharacter::Tick(float DeltaSeconds)
 	// if(GEngine)
 	// 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DeltaSeconds * 35.0));	
 	
-	GetTopDownCameraComponent()->SetFieldOfView(FMath::Lerp(GetTopDownCameraComponent()->FieldOfView, TargetFov, DeltaSeconds * 5.0));
+	GetTopDownCameraComponent()->SetFieldOfView(FMath::Lerp(GetTopDownCameraComponent()->FieldOfView, TargetFov, DeltaSeconds * 10.0));
 }
 
 void ATopDownerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

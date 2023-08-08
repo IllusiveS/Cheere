@@ -16,6 +16,8 @@ class TOPDOWNER_API UTopDownerGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 public:
+	UTopDownerGameplayAbility();
+	
 	UPROPERTY(BlueprintAssignable)
 	FGameplayAbilityEnded OnAbilityEnded;
 	

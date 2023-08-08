@@ -39,7 +39,7 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 				auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
 								,&target->GetOwner()->GetTransform());
 
-				if(EffectToGive->IsValidLowLevel())
+				if(EffectToGive != nullptr && EffectToGive->IsValidLowLevel())
 				{
 					IEnemySpawnerInterface::Execute_SetUniqueEffect(Spawner, EffectToGive);
 				}

@@ -24,6 +24,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void BeginDestroy() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
 public:
 	/** Please add a variable description */
@@ -67,6 +68,9 @@ public:
 	void OrderNeedlessUnitsOutOfGroup();
 	UFUNCTION(BlueprintCallable)
 	void AllowRemovalOfNeedlessUnits();
+
+	UFUNCTION()
+	void CheckForSelfDestruction();
 	
 protected:
 	UPROPERTY()

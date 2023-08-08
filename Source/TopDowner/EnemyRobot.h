@@ -49,6 +49,9 @@ public:
 	
 	UPROPERTY(Category=Abilities, VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UTopDownerAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<class AEnemyGroup> GroupImAPartOf;

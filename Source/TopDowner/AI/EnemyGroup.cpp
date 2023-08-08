@@ -33,9 +33,26 @@ void AEnemyGroup::MergeAnotherGroup(AEnemyGroup* GroupToMergeIn)
 {
 	GroupToMergeIn->IsBeingMerged = true;
 
+	if (GroupToMergeIn->IsActivated)
+	{
+		IsActivated = true;
+	}
+	
 	for(const auto Enemy : GroupToMergeIn->EnemiesInRange)
 	{
 		Enemy->GroupImAPartOf = this;
+		if (IsActivated == true)
+		{
+			Enemy->ActivateLow();
+		}
+	}
+
+	if(IsActivated)
+	{
+		for(const auto Enemy : EnemiesInRange)
+		{
+			Enemy->ActivateLow();
+		}
 	}
 
 	EnemiesInRange.Append(GroupToMergeIn->EnemiesInRange);
@@ -59,11 +76,15 @@ void AEnemyGroup::BeginPlay()
 	{
 		CombatController->AddGroupToCombat(this);
 	}
+
+	FTimerHandle Handle;
+	FTimerDelegate Delegate;
+	Delegate.BindUObject(this, &AEnemyGroup::CheckForSelfDestruction);
+	GetWorld()->GetTimerManager().SetTimer(Handle, Delegate, 0.1f, true);
 }
 
 void AEnemyGroup::BeginDestroy()
 {
-	Super::BeginDestroy();
 
 	for (auto enemy : EnemiesInRange)
 	{
@@ -74,6 +95,18 @@ void AEnemyGroup::BeginDestroy()
 	{
 		CombatController->RemoveGroupFromCombat(this);
 	}
+	
+	Super::BeginDestroy();
+}
+
+void AEnemyGroup::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(GetWorld()))
+	{
+		CombatController->RemoveGroupFromCombat(this);
+	}
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void AEnemyGroup::Tick(float DeltaSeconds)
@@ -125,7 +158,7 @@ void AEnemyGroup::SetGroupTarget(FVector target)
 
 bool AEnemyGroup::CanJoinGroup(AEnemyRobot* Enemy)
 {
-	if (Enemy->GroupImAPartOf->IsValidLowLevel()) return false;
+	if (Enemy->GroupImAPartOf != nullptr && Enemy->GroupImAPartOf->IsValidLowLevel()) return false;
 	UpdateUnitCosts();
 	return (CostOfUnits + Enemy->UnitGroupCost) <= MaxCostOfUnits;
 }
@@ -164,6 +197,11 @@ void AEnemyGroup::ReactToEnemyDead(AEnemyRobot* Enemy)
 void AEnemyGroup::AllowRemovalOfNeedlessUnits()
 {
 	isRemovingNeedlessUnit = false;	
+}
+
+void AEnemyGroup::CheckForSelfDestruction()
+{
+	if (EnemiesInRange.IsEmpty()) Destroy();
 }
 
 void AEnemyGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

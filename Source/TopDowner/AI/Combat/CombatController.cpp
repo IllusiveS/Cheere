@@ -6,10 +6,12 @@
 #include "Algo/Accumulate.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "TopDowner/EnemyRobot.h"
+#include "TopDowner/TopDowner.h"
 #include "TopDowner/AI/EnemyGroup.h"
 
 void ACombatController::BeginCombat()
 {
+	
 }
 
 void ACombatController::EndCombat()
@@ -37,16 +39,26 @@ AEnemyGroup* ACombatController::GetUnactivatedGroup()
 	{
 		return Enemy1.CostOfUnits > Enemy2.CostOfUnits;
 	});
-	
+
+	GroupsInCombat = GroupsInCombat.FilterByPredicate([](auto& Group) { return Group->IsValidLowLevel();});
+
+	UE_LOG(LogTopDowner, Log, TEXT("Finding group among %i"), GroupsInCombat.Num());
 	for(const auto group : GroupsInCombat)
 	{
-		if (group == nullptr) continue;
-		if (group->IsActivated == false && group->IsBeingMerged == false)
+		if (group == nullptr)
 		{
+			UE_LOG(LogTopDowner, Log, TEXT("Group corrupted"));
+			continue;
+		}
+		UE_LOG(LogTopDowner, Log, TEXT("Processing group %s"), *group->GetName());
+		if (group->IsActivated == false && group->IsValidLowLevel())
+		{
+			UE_LOG(LogTopDowner, Log, TEXT("Found correct group"));
 			GroupToReturn = group;
 			break;
 		}
 	}
+	//UE_LOG(LogTopDowner, Log, TEXT("Returned group %s"), GroupToReturn ? *GroupToReturn->GetName() : TEXT("NULL"));
 	return GroupToReturn;
 }
 

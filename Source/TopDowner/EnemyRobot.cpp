@@ -3,6 +3,7 @@
 
 #include "EnemyRobot.h"
 
+#include "../../../../UnrealSource/UnrealEngine/Engine/Plugins/Animation/MotionWarping/Source/MotionWarping/Public/MotionWarpingComponent.h"
 #include "AI/EnemyGroup.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TopDownerAbilitySystemComponent.h"
@@ -20,6 +21,7 @@ AEnemyRobot::AEnemyRobot()
 	BasicEntityAttributes = CreateDefaultSubobject<UBasicCharacterAttributeSet>(TEXT("HealthAttributes"));
 	FearAttributes = CreateDefaultSubobject<UFearAttributeSet>(TEXT("FearAttributes"));
 	MovementAttributes = CreateDefaultSubobject<UMovementAttributeSet>(TEXT("MovementAttributes"));
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetMaxWalkSpeedAttribute())
 		.AddUObject(this, &AEnemyRobot::WalkSpeedChanged);
@@ -68,7 +70,7 @@ void AEnemyRobot::BrakingDecelerationWalkingChanged(const FOnAttributeChangeData
 void AEnemyRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (GroupImAPartOf->IsValidLowLevel() == false)
+	if (GroupImAPartOf != nullptr && GroupImAPartOf->IsValidLowLevel() == false)
 	{
 		GroupImAPartOf = nullptr;
 	}

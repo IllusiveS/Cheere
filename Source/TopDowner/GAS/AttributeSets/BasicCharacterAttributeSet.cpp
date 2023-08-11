@@ -26,7 +26,7 @@ void UBasicCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffec
 		if (GetCurrentHealth() <= 0.0)
 		{
 			component->AddEffect(this, DeadGameplayEffect);
-			if (DeadGameplayEffect->IsValidLowLevel())
+			if (DeadGameplayEffect != nullptr && DeadGameplayEffect->IsValidLowLevel())
 			{
 				//Apply pushback
                 if (auto SourceActor = Cast<ACharacter>(Data.EffectSpec.GetContext().GetInstigator()))

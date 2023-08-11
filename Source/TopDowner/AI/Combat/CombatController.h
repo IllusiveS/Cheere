@@ -72,7 +72,6 @@ public:
 	// void ActivateEnemyHigh();
 	// UFUNCTION(BlueprintCallable)
 	// void ActivateEnemyLow();
-	
 protected:
 	UPROPERTY()
 	TMap<UClass*, int> EnemiesAmounts;

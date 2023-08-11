@@ -43,7 +43,7 @@ void AEnemyGroup::MergeAnotherGroup(AEnemyGroup* GroupToMergeIn)
 		Enemy->GroupImAPartOf = this;
 		if (IsActivated == true)
 		{
-			Enemy->ActivateLow();
+			IAICombatInterface::Execute_ActivateLow(Enemy);
 		}
 	}
 
@@ -51,7 +51,7 @@ void AEnemyGroup::MergeAnotherGroup(AEnemyGroup* GroupToMergeIn)
 	{
 		for(const auto Enemy : EnemiesInRange)
 		{
-			Enemy->ActivateLow();
+			IAICombatInterface::Execute_ActivateLow(Enemy);
 		}
 	}
 
@@ -201,7 +201,12 @@ void AEnemyGroup::AllowRemovalOfNeedlessUnits()
 
 void AEnemyGroup::CheckForSelfDestruction()
 {
-	if (EnemiesInRange.IsEmpty()) Destroy();
+	EnemiesInRange = EnemiesInRange.FilterByPredicate([](auto const Enemy) {return !Enemy->IsDead;});
+	
+	if (EnemiesInRange.IsEmpty())
+	{
+		Destroy();
+	}
 }
 
 void AEnemyGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

@@ -5,6 +5,7 @@
 
 #include "../../../../UnrealSource/UnrealEngine/Engine/Plugins/Animation/MotionWarping/Source/MotionWarping/Public/MotionWarpingComponent.h"
 #include "AI/EnemyGroup.h"
+#include "AI/Combat/CombatControllerSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TopDownerAbilitySystemComponent.h"
 #include "GAS/AttributeSets/BasicCharacterAttributeSet.h"
@@ -44,6 +45,11 @@ void AEnemyRobot::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotat
 void AEnemyRobot::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(GetWorld()))
+	{
+		CombatController->AddEnemyToCombat(this);
+	}
 }
 
 void AEnemyRobot::WalkSpeedChanged(const FOnAttributeChangeData& Data)
@@ -83,9 +89,35 @@ void AEnemyRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+bool AEnemyRobot::IsActivated() const
+{
+	return ActivationType != EActivationType::None;
+}
+
 void AEnemyRobot::ChangeGroup(AEnemyGroup* Group)
 {
 	//if (GroupImAPartOf)
 	
 	GroupImAPartOf = Group;
+}
+
+bool AEnemyRobot::ActivateLow_Implementation()
+{
+	ActivationType = EActivationType::Low;
+	OnEnemyActivatedLow.Broadcast(this);
+	return true;
+}
+
+bool AEnemyRobot::ActivateHigh_Implementation()
+{
+	ActivationType = EActivationType::High;
+	OnEnemyActivatedHigh.Broadcast(this);
+	return true;
+}
+
+bool AEnemyRobot::ActivateNone_Implementation()
+{
+	ActivationType = EActivationType::None;
+	OnEnemyDeactivated.Broadcast(this);
+	return true;
 }

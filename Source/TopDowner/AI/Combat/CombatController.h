@@ -19,13 +19,13 @@ class IAICombatInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateLow();
-	bool ActivateLow_Implementation(){return false;}
+	virtual bool ActivateLow_Implementation(){return false;}
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateHigh();
-	bool ActivateHigh_Implementation(){return false;}
+	virtual bool ActivateHigh_Implementation(){return false;}
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateNone();
-	bool ActivateNone_Implementation(){return false;}
+	virtual bool ActivateNone_Implementation(){return false;}
 };
 
 /**
@@ -72,6 +72,31 @@ public:
 	// void ActivateEnemyHigh();
 	// UFUNCTION(BlueprintCallable)
 	// void ActivateEnemyLow();
+
+	//Single Unit Controls
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyRobot* GetRandomUnactiveBasicEnemy() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfBasicEnemies();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfActiveBasicEnemies();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyRobot* GetRandomUnactiveSpecialEnemy() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfSpecialEnemies();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfActiveSpecialEnemies();
+
+	UFUNCTION()
+	void ReactToEnemyActivatedLow(class AEnemyRobot* Enemy);
+	UFUNCTION()
+	void ReactToEnemyActivatedHigh(class AEnemyRobot* Enemy);
+	UFUNCTION()
+	void ReactToEnemyDeactivated(class AEnemyRobot* Enemy);
+	UFUNCTION()
+	void ReactToEnemyDied(class AEnemyRobot* Enemy);
+	
 protected:
 	UPROPERTY()
 	TMap<UClass*, int> EnemiesAmounts;
@@ -87,9 +112,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<class AEnemyGroup *> BoredGroups;
-	
+
+	//TODO turn to sets?
 	UPROPERTY()
-	TArray<class AEnemyRobot*> AllEnemiesInCombat;
+	TSet<class AEnemyRobot*> AllEnemiesInCombat;
 	UPROPERTY()
 	TArray<class AEnemyRobot*> NotActiveEnemiesInCombat;
 	UPROPERTY()

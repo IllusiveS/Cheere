@@ -108,7 +108,12 @@ void ACombatController::AddEnemyToCombat(AEnemyRobot* NewRobot)
 {
 	AllEnemiesInCombat.Add(NewRobot);
 	NotActiveEnemiesInCombat.Add(NewRobot);
-	AddEnemyToAmountMap(NewRobot);	
+	AddEnemyToAmountMap(NewRobot);
+
+	NewRobot->OnEnemyDead.AddDynamic(this, &ACombatController::ReactToEnemyDied);
+	NewRobot->OnEnemyActivatedHigh.AddDynamic(this, &ACombatController::ReactToEnemyActivatedHigh);
+	NewRobot->OnEnemyActivatedLow.AddDynamic(this, &ACombatController::ReactToEnemyActivatedLow);
+	NewRobot->OnEnemyDeactivated.AddDynamic(this, &ACombatController::ReactToEnemyDeactivated);
 }
 
 void ACombatController::AddRequiredEnemyToCombat(AEnemyRobot* NewRobot)
@@ -132,8 +137,120 @@ void ACombatController::Tick(float DeltaSeconds)
 	if (const auto bb = GetBlackboardComponent())
 	{
 		GroupsInCombat = GroupsInCombat.FilterByPredicate([](auto Group) { return Group != nullptr; });
-		bb->SetValueAsInt("ActiveGroups", Algo::Accumulate(GroupsInCombat, 0, [](auto val, auto Group){ return val + Group->IsActivated ? 1 : 0; }));
+
+		bb->SetValueAsInt("SpecialEnemiesActive", GetNumberOfActiveSpecialEnemies());
+		bb->SetValueAsInt("BasicEnemiesActive", GetNumberOfActiveBasicEnemies());
 	}
+}
+
+AEnemyRobot* ACombatController::GetRandomUnactiveBasicEnemy() const
+{
+	AEnemyRobot* EnemyToReturn = nullptr;
+
+	TSet<AEnemyRobot*> PossibleOptions;
+	for(const auto Enemy : AllEnemiesInCombat)
+	{
+		if (Enemy->ActivationType == EActivationType::None && Enemy->EnemyType == EEnemyType::Basic)
+		{
+			PossibleOptions.Add(Enemy);
+		}
+	}
+	
+	if (PossibleOptions.IsEmpty()) return nullptr;
+
+	EnemyToReturn = PossibleOptions.Array()[FMath::RandRange(0, PossibleOptions.Num() - 1)];
+	return EnemyToReturn;
+}
+
+int ACombatController::GetNumberOfBasicEnemies()
+{
+	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
+	{
+		Result += Enemy->EnemyType == EEnemyType::Basic ? 1 : 0;
+		return Result;
+	});
+	return ReturnValue;
+}
+
+int ACombatController::GetNumberOfActiveBasicEnemies()
+{
+	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
+	{
+		Result += Enemy->IsActivated() && Enemy->EnemyType == EEnemyType::Basic ? 1 : 0;
+		return Result;
+	});
+	return ReturnValue;
+}
+
+AEnemyRobot* ACombatController::GetRandomUnactiveSpecialEnemy() const
+{
+	AEnemyRobot* EnemyToReturn = nullptr;
+
+	TSet<AEnemyRobot*> PossibleOptions;
+	for(const auto Enemy : AllEnemiesInCombat)
+	{
+		if (Enemy->ActivationType == EActivationType::None && Enemy->EnemyType == EEnemyType::Special)
+		{
+			PossibleOptions.Add(Enemy);
+		}
+	}
+	
+	if (PossibleOptions.IsEmpty()) return nullptr;
+
+	EnemyToReturn = PossibleOptions.Array()[FMath::RandRange(0, PossibleOptions.Num())];
+	return EnemyToReturn;
+}
+
+int ACombatController::GetNumberOfSpecialEnemies()
+{
+	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
+	{
+		Result += Enemy->EnemyType == EEnemyType::Special ? 1 : 0;
+		return Result;
+	});
+	return ReturnValue;
+}
+
+int ACombatController::GetNumberOfActiveSpecialEnemies()
+{
+	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
+	{
+		Result += Enemy->IsActivated() && Enemy->EnemyType == EEnemyType::Special ? 1 : 0;
+		return Result;
+	});
+	return ReturnValue;
+}
+
+void ACombatController::ReactToEnemyActivatedLow(AEnemyRobot* Enemy)
+{
+	NotActiveEnemiesInCombat.Remove(Enemy);
+	LowActiveEnemiesInCombat.Add(Enemy);
+}
+
+void ACombatController::ReactToEnemyActivatedHigh(AEnemyRobot* Enemy)
+{
+	NotActiveEnemiesInCombat.Remove(Enemy);
+	HighActiveEnemiesInCombat.Add(Enemy);
+}
+
+void ACombatController::ReactToEnemyDeactivated(AEnemyRobot* Enemy)
+{
+	NotActiveEnemiesInCombat.Add(Enemy);
+	HighActiveEnemiesInCombat.Remove(Enemy);
+	LowActiveEnemiesInCombat.Remove(Enemy);
+}
+
+void ACombatController::ReactToEnemyDied(AEnemyRobot* Enemy)
+{
+	NotActiveEnemiesInCombat.Remove(Enemy);
+	HighActiveEnemiesInCombat.Remove(Enemy);
+	LowActiveEnemiesInCombat.Remove(Enemy);
+	AllEnemiesInCombat.Remove(Enemy);
+
+	Enemy->OnEnemyDead.RemoveDynamic(this, &ACombatController::ReactToEnemyDied);
+	Enemy->OnEnemyActivatedHigh.RemoveDynamic(this, &ACombatController::ReactToEnemyActivatedHigh);
+	Enemy->OnEnemyActivatedLow.RemoveDynamic(this, &ACombatController::ReactToEnemyActivatedLow);
+	Enemy->OnEnemyDeactivated.RemoveDynamic(this, &ACombatController::ReactToEnemyDeactivated);
 }
 
 void ACombatController::AddEnemyToAmountMap(AEnemyRobot* NewRobot)
@@ -143,7 +260,7 @@ void ACombatController::AddEnemyToAmountMap(AEnemyRobot* NewRobot)
 		EnemiesAmounts[NewRobot->GetClass()]++;
 	} else
 	{
-		EnemiesAmounts[NewRobot->GetClass()] = 1;
+		EnemiesAmounts.Add(NewRobot->GetClass(), 1);
 	}
 }
 

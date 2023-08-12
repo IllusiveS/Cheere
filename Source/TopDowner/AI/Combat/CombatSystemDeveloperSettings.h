@@ -23,5 +23,9 @@ public:
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
 	TSoftObjectPtr<UBehaviorTree> CombatTree;
-;
+
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
+	int DesiredBasicEnemyAmount;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
+	int DesiredSpecialEnemyAmount;
 };

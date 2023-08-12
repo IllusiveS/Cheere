@@ -10,6 +10,22 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyRobotDelegate, AEnemyRobot*, Robot);
 
+UENUM(BlueprintType)
+enum class EActivationType : uint8
+{
+	None,
+	Low,
+	High
+};
+
+UENUM(BlueprintType)
+enum class EEnemyType : uint8
+{
+	Basic,
+	Special,
+	None
+};
+
 UCLASS()
 class TOPDOWNER_API AEnemyRobot : public ACharacter, public IAICombatInterface
 {
@@ -25,7 +41,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
 	virtual void WalkSpeedChanged(const FOnAttributeChangeData& Data);
 	virtual void MaxAccelerationChanged(const FOnAttributeChangeData& Data);
 	virtual void GroundFrictionChanged(const FOnAttributeChangeData& Data);
@@ -37,6 +52,13 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(BlueprintReadWrite)
+	TEnumAsByte<EEnemyType> EnemyType{EEnemyType::Basic};
+	UFUNCTION(BlueprintPure, BlueprintCallable)
+	bool IsActivated() const;
+	UPROPERTY(BlueprintReadWrite)
+	TEnumAsByte<EActivationType> ActivationType { EActivationType::None };
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Instanced, Category = "Attributes")
 	TObjectPtr<class UBasicCharacterAttributeSet> BasicEntityAttributes;
@@ -61,12 +83,30 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FVector LastDmgDir;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool ActivateLow();
+	virtual bool ActivateLow_Implementation() override;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool ActivateHigh();
+	virtual bool ActivateHigh_Implementation() override;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool ActivateNone();
+	virtual bool ActivateNone_Implementation() override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int UnitGroupCost {1};
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FEnemyRobotDelegate OnEnemyDead;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEnemyRobotDelegate OnEnemyActivatedLow;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEnemyRobotDelegate OnEnemyActivatedHigh;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEnemyRobotDelegate OnEnemyDeactivated;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetTargetPosition(FVector targetPos);

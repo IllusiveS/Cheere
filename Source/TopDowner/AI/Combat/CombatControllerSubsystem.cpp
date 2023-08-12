@@ -16,10 +16,12 @@ UCombatControllerSubsystem::UCombatControllerSubsystem()
 void UCombatControllerSubsystem::StartCombat()
 {
 	CombatController->RunBehaviorTree(CombatTree);
+
+	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
 	
 	auto BB = CombatController->GetBlackboardComponent();
-	CombatController->GetBlackboardComponent()->SetValueAsInt("ActiveGroups", 0);
-	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredActiveGroupsNumber", 3);
+	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredSpecialEnemiesActive", SGSettings->DesiredSpecialEnemyAmount);
+	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredBasicEnemiesActive", SGSettings->DesiredBasicEnemyAmount);
 	CombatController->BeginCombat();
 }
 

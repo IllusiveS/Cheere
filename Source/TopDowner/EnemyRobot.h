@@ -6,25 +6,10 @@
 #include "GameFramework/Character.h"
 #include "GameplayEffectTypes.h"
 #include "AI/Combat/CombatController.h"
+#include "EnemyEnums.h"
 #include "EnemyRobot.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyRobotDelegate, AEnemyRobot*, Robot);
-
-UENUM(BlueprintType)
-enum class EActivationType : uint8
-{
-	None,
-	Low,
-	High
-};
-
-UENUM(BlueprintType)
-enum class EEnemyType : uint8
-{
-	Basic,
-	Special,
-	None
-};
 
 UCLASS()
 class TOPDOWNER_API AEnemyRobot : public ACharacter, public IAICombatInterface

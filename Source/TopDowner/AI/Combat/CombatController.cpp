@@ -143,6 +143,25 @@ void ACombatController::Tick(float DeltaSeconds)
 	}
 }
 
+AEnemyRobot* ACombatController::GetRandomUnactiveEnemy(TEnumAsByte<EEnemyType> EnemyType) const
+{
+	AEnemyRobot* EnemyToReturn = nullptr;
+
+	TSet<AEnemyRobot*> PossibleOptions;
+	for(const auto Enemy : AllEnemiesInCombat)
+	{
+		if (Enemy->ActivationType == EActivationType::None && Enemy->EnemyType == EnemyType)
+		{
+			PossibleOptions.Add(Enemy);
+		}
+	}
+	
+	if (PossibleOptions.IsEmpty()) return nullptr;
+
+	EnemyToReturn = PossibleOptions.Array()[FMath::RandRange(0, PossibleOptions.Num() - 1)];
+	return EnemyToReturn;
+}
+
 AEnemyRobot* ACombatController::GetRandomUnactiveBasicEnemy() const
 {
 	AEnemyRobot* EnemyToReturn = nullptr;

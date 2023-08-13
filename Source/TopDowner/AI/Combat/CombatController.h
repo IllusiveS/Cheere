@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "TopDowner/EnemyEnums.h"
 #include "CombatController.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -74,6 +75,8 @@ public:
 	// void ActivateEnemyLow();
 
 	//Single Unit Controls
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyRobot* GetRandomUnactiveEnemy(TEnumAsByte<EEnemyType> EnemyType) const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveBasicEnemy() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)

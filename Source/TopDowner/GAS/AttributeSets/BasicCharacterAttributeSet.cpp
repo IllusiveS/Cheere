@@ -38,7 +38,7 @@ void UBasicCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffec
                 	const auto DirNormalized = Dir.GetSafeNormal();
                 	
                 	CurrentActor->GetMesh()->SetSimulatePhysics(true);
-                	CurrentActor->GetMesh()->AddImpulse(DirNormalized * LocalDamageDone * 1200 * FMath::RandRange(1.0, 1.9), NAME_None, true);
+                	CurrentActor->GetMesh()->AddImpulse(DirNormalized * LocalDamageDone * PushbackMultiplier * FMath::RandRange(1.0, 1.9), NAME_None, true);
                 }
 			}
 		}

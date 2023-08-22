@@ -52,7 +52,7 @@ public:
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 	UPROPERTY(EditAnywhere)
-	float PushbackMultiplier {1200.0f};
+	float PushbackMultiplier {200.0f};
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Attributes")
 	TSubclassOf<class UTopDownerGameplayEffect> DeadGameplayEffect;

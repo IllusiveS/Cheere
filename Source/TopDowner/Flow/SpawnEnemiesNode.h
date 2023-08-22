@@ -26,6 +26,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category=Spawning)
 	void SetUniqueFlowTag(FGameplayTagContainer UniqueEffect);
+
+	UFUNCTION(BlueprintImplementableEvent, Category=Spawning)
+	class AEnemyRobot* GetSpawnedEnemy();
 	/** Add interface function declarations here */
 };
 
@@ -52,6 +55,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TMap<TSubclassOf<class AEnemyRobot>, int> EnemiesToSpawn;
 
+	UPROPERTY()
+	TSet<class AEnemyRobot*> SpawnedEnemies;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UTopDownerGameplayEffect> EffectToGive;
 
@@ -60,6 +66,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	float DelayBetweenSpawns;
+
+	UFUNCTION()
+	void RemoveEnemyFromSpawned(class AEnemyRobot* Robot);
 	
 	virtual void ExecuteInput(const FName& PinName) override;
 

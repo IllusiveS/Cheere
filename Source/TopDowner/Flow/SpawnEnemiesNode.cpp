@@ -19,9 +19,20 @@ USpawnEnemiesNode::USpawnEnemiesNode()
 	OutputPins.Empty();
 	OutputPins.Add(FFlowPin(TEXT("StartedSpawn")));
 	OutputPins.Add(FFlowPin(TEXT("FinishedSpawn")));
+	OutputPins.Add(FFlowPin(TEXT("EnemiesDead")));
 	
 	static ConstructorHelpers::FObjectFinder<UClass> Spawner (TEXT("/Script/Engine.Blueprint'/Game/TopDown/LevelElements/BP_EnemySpawnerAnimation.BP_EnemySpawnerAnimation_C'"));
 	EnemySpawner = Spawner.Object;
+}
+
+void USpawnEnemiesNode::RemoveEnemyFromSpawned(AEnemyRobot* Robot)
+{
+	SpawnedEnemies.Remove(Robot);
+
+	if (SpawnedEnemies.IsEmpty())
+	{
+		TriggerOutput(TEXT("EnemiesDead"), true);
+	}
 }
 
 void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
@@ -49,6 +60,14 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 					IEnemySpawnerInterface::Execute_SetUniqueFlowTag(Spawner, FlowTagsToGive);
 				}
 				IEnemySpawnerInterface::Execute_SetEnemyToSpawn(Spawner, EnemyToSpawn);
+
+				auto Enemy = IEnemySpawnerInterface::Execute_GetSpawnedEnemy(Spawner);
+				if (Enemy)
+				{
+					SpawnedEnemies.Add(Enemy);
+					Enemy->OnEnemyDead.AddDynamic(this, &USpawnEnemiesNode::RemoveEnemyFromSpawned);
+				}
+				
 			};
 
 			auto NumberOfEnemies = Algo::Accumulate(EnemiesToSpawn, 0, [](auto Acc, auto&& pair)
@@ -106,7 +125,7 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 
 void USpawnEnemiesNode::FinishSpawning()
 {
-	TriggerOutput(TEXT("FinishedSpawn"), true);
+	TriggerOutput(TEXT("FinishedSpawn"), false);
 }
 
 #if WITH_EDITOR

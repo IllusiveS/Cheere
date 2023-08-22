@@ -7,23 +7,43 @@
 #include "CombatController.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "CombatSystemDeveloperSettings.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UCombatControllerSubsystem::UCombatControllerSubsystem()
 {
-	CombatController = CreateDefaultSubobject<ACombatController>(TEXT("Controller"));
+}
+
+void UCombatControllerSubsystem::StartCombat()
+{
+	CombatController->RunBehaviorTree(CombatTree);
+
+	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
+	
+	auto BB = CombatController->GetBlackboardComponent();
+	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredSpecialEnemiesActive", SGSettings->DesiredSpecialEnemyAmount);
+	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredBasicEnemiesActive", SGSettings->DesiredBasicEnemyAmount);
+	CombatController->BeginCombat();
+}
+
+void UCombatControllerSubsystem::EndCombat()
+{
+	CombatController->GetBrainComponent()->StopLogic("Combat end");
 }
 
 void UCombatControllerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+	CombatController = GetWorld()->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
+	
 	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
 	
-	CombatTree = SGSettings->CombatTree.GetDefaultObject();
+	CombatTree = SGSettings->CombatTree.LoadSynchronous();
 }
 
 ACombatController* UCombatControllerFunctionLibrary::GetCombatController(const UObject* WorldContextObject)
 {
+	if (WorldContextObject == nullptr) return nullptr;
 	if (const auto Subsystem = WorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UCombatControllerSubsystem>())
 	{
 		return Subsystem->CombatController;

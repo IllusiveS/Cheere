@@ -22,5 +22,10 @@ public:
 	FString SaveSlotName;
 
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
-	TSubclassOf<UBehaviorTree> CombatTree;
+	TSoftObjectPtr<UBehaviorTree> CombatTree;
+
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
+	int DesiredBasicEnemyAmount;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
+	int DesiredSpecialEnemyAmount;
 };

@@ -49,6 +49,52 @@ bool UTopDownerAbilitySystemComponent::HasTag(FGameplayTag TagToCheck)
 	return false;
 }
 
+TArray<FGameplayAbilitySpecHandle> UTopDownerAbilitySystemComponent::RunGameplayAbilityFromEvent(FGameplayTag EventTag,
+	const FGameplayEventData Payload)
+{
+	TArray<FGameplayAbilitySpecHandle> HandlesToReturn;
+	int32 TriggeredCount = 0;
+	FGameplayTag CurrentTag = EventTag;
+	ABILITYLIST_SCOPE_LOCK();
+	while (CurrentTag.IsValid())
+	{
+		if (GameplayEventTriggeredAbilities.Contains(CurrentTag))
+		{
+			TArray<FGameplayAbilitySpecHandle> TriggeredAbilityHandles = GameplayEventTriggeredAbilities[CurrentTag];
+
+			for (const FGameplayAbilitySpecHandle& AbilityHandle : TriggeredAbilityHandles)
+			{
+				if (TriggerAbilityFromGameplayEvent(AbilityHandle, AbilityActorInfo.Get(), EventTag, &Payload, *this))
+				{
+					TriggeredCount++;
+					HandlesToReturn.Add(AbilityHandle);
+				}
+			}
+		}
+
+		CurrentTag = CurrentTag.RequestDirectParent();
+	}
+
+	if (FGameplayEventMulticastDelegate* Delegate = GenericGameplayEventCallbacks.Find(EventTag))
+	{
+		// Make a copy before broadcasting to prevent memory stomping
+		FGameplayEventMulticastDelegate DelegateCopy = *Delegate;
+		DelegateCopy.Broadcast(&Payload);
+	}
+
+	// Make a copy in case it changes due to callbacks
+	TArray<TPair<FGameplayTagContainer, FGameplayEventTagMulticastDelegate>> LocalGameplayEventTagContainerDelegates = GameplayEventTagContainerDelegates;
+	for (TPair<FGameplayTagContainer, FGameplayEventTagMulticastDelegate>& SearchPair : LocalGameplayEventTagContainerDelegates)
+	{
+		if (SearchPair.Key.IsEmpty() || EventTag.MatchesAny(SearchPair.Key))
+		{
+			SearchPair.Value.Broadcast(EventTag, &Payload);
+		}
+	}
+
+	return HandlesToReturn;
+}
+
 void UTopDownerAbilitySystemComponent::GetDamagedTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	unimplemented();

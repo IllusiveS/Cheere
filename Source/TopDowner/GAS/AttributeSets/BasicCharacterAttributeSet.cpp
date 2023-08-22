@@ -26,7 +26,7 @@ void UBasicCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffec
 		if (GetCurrentHealth() <= 0.0)
 		{
 			component->AddEffect(this, DeadGameplayEffect);
-			if (DeadGameplayEffect->IsValidLowLevel())
+			if (DeadGameplayEffect != nullptr && DeadGameplayEffect->IsValidLowLevel())
 			{
 				//Apply pushback
                 if (auto SourceActor = Cast<ACharacter>(Data.EffectSpec.GetContext().GetInstigator()))
@@ -38,7 +38,7 @@ void UBasicCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffec
                 	const auto DirNormalized = Dir.GetSafeNormal();
                 	
                 	CurrentActor->GetMesh()->SetSimulatePhysics(true);
-                	CurrentActor->GetMesh()->AddImpulse(DirNormalized * LocalDamageDone * 1200 * FMath::RandRange(1.0, 1.9), NAME_None, true);
+                	CurrentActor->GetMesh()->AddImpulse(DirNormalized * LocalDamageDone * PushbackMultiplier * FMath::RandRange(1.0, 1.9), NAME_None, true);
                 }
 			}
 		}

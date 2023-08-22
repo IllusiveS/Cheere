@@ -5,7 +5,9 @@
 
 #include "FlowComponent.h"
 #include "FlowSubsystem.h"
+#include "Algo/Accumulate.h"
 #include "TopDowner/EnemyRobot.h"
+#include "TopDowner/TopDowner.h"
 
 USpawnEnemiesNode::USpawnEnemiesNode()
 {
@@ -28,56 +30,74 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 	{
 		auto Components = FlowSubsystem->GetComponents<UFlowComponent>(SpawnerIdentityTags, MatchType, true).Array();
 
-		auto WholeSpawnNumber = 0;
-
-		auto FinishSpawnFunction = [this](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
+		if (!Components.IsEmpty())
 		{
+			auto WholeSpawnNumber = 0;
+
+			auto FinishSpawnFunction = [this](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
+			{
+				auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
+								,&target->GetOwner()->GetTransform());
+
+				if(EffectToGive != nullptr && EffectToGive->IsValidLowLevel())
+				{
+					IEnemySpawnerInterface::Execute_SetUniqueEffect(Spawner, EffectToGive);
+				}
+
+				if(FlowTagsToGive.IsEmpty() == false)
+				{
+					IEnemySpawnerInterface::Execute_SetUniqueFlowTag(Spawner, FlowTagsToGive);
+				}
+				IEnemySpawnerInterface::Execute_SetEnemyToSpawn(Spawner, EnemyToSpawn);
+			};
+
+			auto NumberOfEnemies = Algo::Accumulate(EnemiesToSpawn, 0, [](auto Acc, auto&& pair)
+			{
+				return pair.Value + Acc;
+			});
+	
+			if (NumberOfEnemies <= Components.Num())
+			{
+				for (const TPair<TSubclassOf<class AEnemyRobot>, int> &pair : EnemiesToSpawn)
+				{
+					for (int i = 0; i < pair.Value; i++)
+					{
+						WholeSpawnNumber += 1;
+						const auto RandIndex = FMath::RandRange(0, Components.Num() - 1);
+						auto target = Components[RandIndex];
+
+						FActorSpawnParameters params;
+
+						if (DelayBetweenSpawns != 0.0)
+						{
+							FTimerHandle handle;
+							target->GetOwner()->GetWorld()->GetTimerManager().SetTimer(handle, [=]()
+							{
+								FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
+							}, (WholeSpawnNumber + 1) * DelayBetweenSpawns, false);
+						} else
+						{
+							FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
+						}
 			
-			auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
-							,&target->GetOwner()->GetTransform());
-
-			if(EffectToGive->IsValidLowLevel())
-			{
-				IEnemySpawnerInterface::Execute_SetUniqueEffect(Spawner, EffectToGive);
-			}
-
-			if(FlowTagsToGive.IsEmpty() == false)
-			{
-				IEnemySpawnerInterface::Execute_SetUniqueFlowTag(Spawner, FlowTagsToGive);
-			}
-			IEnemySpawnerInterface::Execute_SetEnemyToSpawn(Spawner, EnemyToSpawn);
-		};
-		
-		for (const TPair<TSubclassOf<class AEnemyRobot>, int> &pair : EnemiesToSpawn)
-		{
-			for (int i = 0; i < pair.Value; i++)
-			{
-				WholeSpawnNumber += 1;
-				const auto RandIndex = FMath::RandRange(0, Components.Num() - 1);
-				auto target = Components[RandIndex];
-
-				FActorSpawnParameters params;
+						Components.RemoveAt(RandIndex);
+					}
+				}
 
 				if (DelayBetweenSpawns != 0.0)
 				{
 					FTimerHandle handle;
-					target->GetOwner()->GetWorld()->GetTimerManager().SetTimer(handle, [=]()
-					{
-						FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
-					}, (WholeSpawnNumber + 1) * DelayBetweenSpawns, false);
-				} else
-				{
-					FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
+					GetWorld()->GetTimerManager().SetTimer(handle, this, &USpawnEnemiesNode::FinishSpawning, WholeSpawnNumber * DelayBetweenSpawns, false);
 				}
-			
-				Components.RemoveAt(RandIndex);
+			} else
+			{
+				UE_LOG(LogTopDowner, Log, TEXT("Not enough spawners found, spawn less enemies or put in more spawners."));
+				FinishSpawning();
 			}
-		}
-
-		if (DelayBetweenSpawns != 0.0)
+		} else
 		{
-			FTimerHandle handle;
-			GetWorld()->GetTimerManager().SetTimer(handle, this, &USpawnEnemiesNode::FinishSpawning, WholeSpawnNumber * DelayBetweenSpawns, false);
+			UE_LOG(LogTopDowner, Log, TEXT("Did not found spawners with desired tag %s"), *SpawnerIdentityTags.ToString());
+			FinishSpawning();
 		}
 	}
 

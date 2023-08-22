@@ -3,6 +3,9 @@
 
 #include "EnemyRobot.h"
 
+#include "../../../../UnrealSource/UnrealEngine/Engine/Plugins/Animation/MotionWarping/Source/MotionWarping/Public/MotionWarpingComponent.h"
+#include "AI/EnemyGroup.h"
+#include "AI/Combat/CombatControllerSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/TopDownerAbilitySystemComponent.h"
 #include "GAS/AttributeSets/BasicCharacterAttributeSet.h"
@@ -19,6 +22,7 @@ AEnemyRobot::AEnemyRobot()
 	BasicEntityAttributes = CreateDefaultSubobject<UBasicCharacterAttributeSet>(TEXT("HealthAttributes"));
 	FearAttributes = CreateDefaultSubobject<UFearAttributeSet>(TEXT("FearAttributes"));
 	MovementAttributes = CreateDefaultSubobject<UMovementAttributeSet>(TEXT("MovementAttributes"));
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetMaxWalkSpeedAttribute())
 		.AddUObject(this, &AEnemyRobot::WalkSpeedChanged);
@@ -27,8 +31,7 @@ AEnemyRobot::AEnemyRobot()
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetGroundFrictionAttribute())
 		.AddUObject(this, &AEnemyRobot::GroundFrictionChanged);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetBrakingDecelerationWalkingAttribute())
-    	.AddUObject(this, &AEnemyRobot::BrakingDecelerationWalkingChanged);
-    		
+    	.AddUObject(this, &AEnemyRobot::BrakingDecelerationWalkingChanged);	
 }
 
 void AEnemyRobot::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotation) const
@@ -42,6 +45,11 @@ void AEnemyRobot::GetActorEyesViewPoint(FVector& OutLocation, FRotator& OutRotat
 void AEnemyRobot::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(GetWorld()))
+	{
+		CombatController->AddEnemyToCombat(this);
+	}
 }
 
 void AEnemyRobot::WalkSpeedChanged(const FOnAttributeChangeData& Data)
@@ -68,7 +76,10 @@ void AEnemyRobot::BrakingDecelerationWalkingChanged(const FOnAttributeChangeData
 void AEnemyRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (GroupImAPartOf != nullptr && GroupImAPartOf->IsValidLowLevel() == false)
+	{
+		GroupImAPartOf = nullptr;
+	}
 }
 
 // Called to bind functionality to input
@@ -78,3 +89,35 @@ void AEnemyRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
+bool AEnemyRobot::IsActivated() const
+{
+	return ActivationType != EActivationType::None;
+}
+
+void AEnemyRobot::ChangeGroup(AEnemyGroup* Group)
+{
+	//if (GroupImAPartOf)
+	
+	GroupImAPartOf = Group;
+}
+
+bool AEnemyRobot::ActivateLow_Implementation()
+{
+	ActivationType = EActivationType::Low;
+	OnEnemyActivatedLow.Broadcast(this);
+	return true;
+}
+
+bool AEnemyRobot::ActivateHigh_Implementation()
+{
+	ActivationType = EActivationType::High;
+	OnEnemyActivatedHigh.Broadcast(this);
+	return true;
+}
+
+bool AEnemyRobot::ActivateNone_Implementation()
+{
+	ActivationType = EActivationType::None;
+	OnEnemyDeactivated.Broadcast(this);
+	return true;
+}

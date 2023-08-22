@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "TopDowner/EnemyEnums.h"
 #include "CombatController.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -19,13 +20,13 @@ class IAICombatInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateLow();
-	bool ActivateLow_Implementation(){return false;}
+	virtual bool ActivateLow_Implementation(){return false;}
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateHigh();
-	bool ActivateHigh_Implementation(){return false;}
+	virtual bool ActivateHigh_Implementation(){return false;}
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateNone();
-	bool ActivateNone_Implementation(){return false;}
+	virtual bool ActivateNone_Implementation(){return false;}
 };
 
 /**
@@ -43,6 +44,22 @@ public:
 	void EndCombat();
 
 	UFUNCTION(BlueprintCallable)
+	void AddGroupToCombat(class AEnemyGroup* NewRobot);
+	UFUNCTION(BlueprintCallable)
+	void RemoveGroupFromCombat(class AEnemyGroup* NewRobot);
+
+	UFUNCTION(BlueprintPure)
+	AEnemyGroup* GetUnactivatedGroup();
+
+	UFUNCTION(BlueprintPure)
+	AEnemyGroup* GetBoredGroup();
+	UFUNCTION()
+	void TimerOnBoredomEnded(class AEnemyGroup* Group);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyGroup* FindNearestAcceptableGroup(class AEnemyRobot* Enemy);
+	
+	UFUNCTION(BlueprintCallable)
 	void AddEnemyToCombat(class AEnemyRobot* NewRobot);
 	UFUNCTION(BlueprintCallable)
 	void AddRequiredEnemyToCombat(class AEnemyRobot* NewRobot);
@@ -50,11 +67,38 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveEnemyFromCombat(class AEnemyRobot* NewRobot);
 
+	virtual void Tick(float DeltaSeconds) override;
 	
 	// UFUNCTION(BlueprintCallable)
 	// void ActivateEnemyHigh();
 	// UFUNCTION(BlueprintCallable)
 	// void ActivateEnemyLow();
+
+	//Single Unit Controls
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyRobot* GetRandomUnactiveEnemy(TEnumAsByte<EEnemyType> EnemyType) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyRobot* GetRandomUnactiveBasicEnemy() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfBasicEnemies();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfActiveBasicEnemies();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class AEnemyRobot* GetRandomUnactiveSpecialEnemy() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfSpecialEnemies();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfActiveSpecialEnemies();
+
+	UFUNCTION()
+	void ReactToEnemyActivatedLow(class AEnemyRobot* Enemy);
+	UFUNCTION()
+	void ReactToEnemyActivatedHigh(class AEnemyRobot* Enemy);
+	UFUNCTION()
+	void ReactToEnemyDeactivated(class AEnemyRobot* Enemy);
+	UFUNCTION()
+	void ReactToEnemyDied(class AEnemyRobot* Enemy);
 	
 protected:
 	UPROPERTY()
@@ -65,9 +109,16 @@ protected:
 
 	UPROPERTY()
 	UBehaviorTree* CombatTree;
-	
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<class AEnemyGroup *> GroupsInCombat;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<class AEnemyGroup *> BoredGroups;
+
+	//TODO turn to sets?
 	UPROPERTY()
-	TArray<class AEnemyRobot*> AllEnemiesInCombat;
+	TSet<class AEnemyRobot*> AllEnemiesInCombat;
 	UPROPERTY()
 	TArray<class AEnemyRobot*> NotActiveEnemiesInCombat;
 	UPROPERTY()

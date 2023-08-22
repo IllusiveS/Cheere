@@ -5,6 +5,7 @@
 
 #include "FlowComponent.h"
 #include "FlowSubsystem.h"
+#include "TopDowner/AI/Combat/CombatControllerSubsystem.h"
 
 void UActivateEnemies::ExecuteInput(const FName& PinName)
 {
@@ -21,6 +22,10 @@ void UActivateEnemies::ExecuteInput(const FName& PinName)
 			Component->NotifyFromGraph(Notify, NetMode);
 		}
 	}
-
+	if (UCombatControllerSubsystem* CombatSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UCombatControllerSubsystem>())
+	{
+		CombatSubsystem->StartCombat();
+	}
+	
 	TriggerFirstOutput(true);
 }

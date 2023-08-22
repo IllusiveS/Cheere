@@ -32,6 +32,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool HasTag(FGameplayTag TagToCheck);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FGameplayAbilitySpecHandle> RunGameplayAbilityFromEvent(FGameplayTag EventTag, const FGameplayEventData Payload);
 	
 	//ReactionToChange	
 	virtual void GetDamagedTagChanged(const FGameplayTag CallbackTag, int32 NewCount);

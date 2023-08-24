@@ -8,6 +8,7 @@
 #include "Algo/Accumulate.h"
 #include "TopDowner/EnemyRobot.h"
 #include "TopDowner/TopDowner.h"
+#include "TopDowner/AI/Combat/CombatControllerSubsystem.h"
 
 USpawnEnemiesNode::USpawnEnemiesNode()
 {
@@ -37,6 +38,14 @@ void USpawnEnemiesNode::RemoveEnemyFromSpawned(AEnemyRobot* Robot)
 
 void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 {
+	if (UCombatControllerSubsystem* CombatContrSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UCombatControllerSubsystem>())
+	{
+		if (CombatContrSubsystem->CombatController == nullptr)
+		{
+			CombatContrSubsystem->CombatController = GetWorld()->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
+		}
+	}
+	
 	if (const UFlowSubsystem* FlowSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UFlowSubsystem>())
 	{
 		auto Components = FlowSubsystem->GetComponents<UFlowComponent>(SpawnerIdentityTags, MatchType, true).Array();

@@ -238,7 +238,7 @@ void ATopDownerCharacter::Aim(const FInputActionValue& Value)
 	bool bHitSuccessful = false;
 	
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	bHitSuccessful = PC->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, true, Hit);
+	bHitSuccessful = PC->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel5, true, Hit);
 
 	// If we hit a surface, cache the location
 	if (bHitSuccessful == false)

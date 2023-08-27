@@ -140,6 +140,7 @@ void ACombatController::Tick(float DeltaSeconds)
 
 		bb->SetValueAsInt("SpecialEnemiesActive", GetNumberOfActiveSpecialEnemies());
 		bb->SetValueAsInt("BasicEnemiesActive", GetNumberOfActiveBasicEnemies());
+		bb->SetValueAsInt("NumberOfMeleeActive", GetNumberOfActiveMeleeEnemies());
 	}
 }
 
@@ -181,7 +182,7 @@ AEnemyRobot* ACombatController::GetRandomUnactiveBasicEnemy() const
 	return EnemyToReturn;
 }
 
-int ACombatController::GetNumberOfBasicEnemies()
+int ACombatController::GetNumberOfBasicEnemies() const
 {
 	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
 	{
@@ -191,11 +192,21 @@ int ACombatController::GetNumberOfBasicEnemies()
 	return ReturnValue;
 }
 
-int ACombatController::GetNumberOfActiveBasicEnemies()
+int ACombatController::GetNumberOfActiveBasicEnemies() const
 {
 	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
 	{
 		Result += Enemy->IsActivated() && Enemy->EnemyType == EEnemyType::Basic ? 1 : 0;
+		return Result;
+	});
+	return ReturnValue;
+}
+
+int ACombatController::GetNumberOfActiveMeleeEnemies() const
+{
+	const int ReturnValue = Algo::Accumulate(AllEnemiesInCombat, 0, [](int Result, auto const Enemy)
+	{
+		Result += Enemy->IsActivated() && Enemy->EnemyType == EEnemyType::Melee ? 1 : 0;
 		return Result;
 	});
 	return ReturnValue;

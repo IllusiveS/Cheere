@@ -104,4 +104,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UEnvQuery* SetGroupTargetQuery;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UEnvQuery* DefaultPositionTargetQuery;
 };

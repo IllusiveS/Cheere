@@ -54,6 +54,7 @@ ATopDownerCharacter::ATopDownerCharacter()
 
 	CameraBoomParent = CreateDefaultSubobject<USceneComponent>(TEXT("CameraParent"));
 	CameraBoomParent->SetupAttachment(GetRootComponent());
+	CameraBoomParent->SetRelativeRotation(FRotator(0.0));
 	
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -190,7 +191,7 @@ void ATopDownerCharacter::BeginAim(const FInputActionValue& Value)
 		Subsystem->AddMappingContext(FiringMappingContext, 0);
 	}
 
-	SetActorRotation(FRotator());
+	SetActorRotation(FRotator::ZeroRotator);
 	TargetFov = AimingFov;
 	
 	BeginAiming();

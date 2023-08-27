@@ -12,6 +12,7 @@ UENUM(BlueprintType)
 enum class EEnemyType : uint8
 {
 	Basic,
+	Melee,
 	Special,
 	None
 };

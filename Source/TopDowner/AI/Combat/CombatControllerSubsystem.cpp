@@ -22,6 +22,7 @@ void UCombatControllerSubsystem::StartCombat()
 	auto BB = CombatController->GetBlackboardComponent();
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredSpecialEnemiesActive", SGSettings->DesiredSpecialEnemyAmount);
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredBasicEnemiesActive", SGSettings->DesiredBasicEnemyAmount);
+	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredNumberOfMeleeActive", SGSettings->DesiredMeleeEnemyAmount);
 	CombatController->BeginCombat();
 }
 

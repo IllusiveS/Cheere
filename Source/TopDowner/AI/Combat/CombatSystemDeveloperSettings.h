@@ -27,5 +27,7 @@ public:
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
 	int DesiredBasicEnemyAmount;
 	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
+	int DesiredMeleeEnemyAmount;
+	UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
 	int DesiredSpecialEnemyAmount;
 };

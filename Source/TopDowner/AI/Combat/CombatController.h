@@ -80,9 +80,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveBasicEnemy() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int GetNumberOfBasicEnemies();
+	int GetNumberOfBasicEnemies() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int GetNumberOfActiveBasicEnemies();
+	int GetNumberOfActiveBasicEnemies() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfActiveMeleeEnemies() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveSpecialEnemy() const;

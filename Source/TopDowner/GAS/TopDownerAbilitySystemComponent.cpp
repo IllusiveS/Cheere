@@ -95,6 +95,31 @@ TArray<FGameplayAbilitySpecHandle> UTopDownerAbilitySystemComponent::RunGameplay
 	return HandlesToReturn;
 }
 
+bool UTopDownerAbilitySystemComponent::CanActivateAnyAbility(FGameplayTag Tag, const FGameplayEventData Payload)
+{
+	TArray<FGameplayAbilitySpec> Specs = GetActivatableAbilities();
+	const FGameplayAbilityActorInfo* ActorInfo = AbilityActorInfo.Get();
+	for (const FGameplayAbilitySpec& Spec : Specs)
+	{
+		if (Spec.Ability == nullptr)
+		{
+			continue;
+		}
+		if (Spec.Ability->ShouldAbilityRespondToEvent(ActorInfo, &Payload))
+		{
+			return true;
+		}
+		// TArray<FAbilityTriggerData>& Triggers = Spec.Ability->AbilityTriggers;
+		// for (const FAbilityTriggerData& Data : Triggers)
+		// {
+		// 	if (Data.TriggerTag == Tag && Spec.Ability->ShouldAbilityRespondToEvent(ActorInfo, &Payload))
+		// 	{
+		// 		return true;
+		// 	}
+		// }
+	}
+	return false;
+}
 void UTopDownerAbilitySystemComponent::GetDamagedTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	unimplemented();

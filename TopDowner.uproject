@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{B6D49016-4B2C-7FB4-41F7-0C9C7CDC9EF6}",
+	"EngineAssociation": "{E7DB6192-49BA-781E-BF63-7084FFB1D2AD}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -14,7 +14,8 @@
 				"AIModule",
 				"Flow",
 				"CoreUObject",
-				"DeveloperSettings"
+				"DeveloperSettings",
+				"FlowEditor"
 			]
 		}
 	],

@@ -37,7 +37,7 @@ public:
 	void InitEffects();
 	
 	UFUNCTION(BlueprintCallable, Category = "Effects")
-	void AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> effect);
+	bool AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> effect);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Effects")
 	TArray<TSubclassOf<class UTopDownerGameplayEffect>> DefaultEffects;

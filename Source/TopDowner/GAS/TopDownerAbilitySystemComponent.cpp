@@ -22,7 +22,7 @@ void UTopDownerAbilitySystemComponent::InitEffects()
     }
 }
 
-void UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> Effect)
+bool UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> Effect)
 {
 	TSubclassOf<UTopDownerGameplayEffect>& EffectRef = Effect;
 
@@ -30,12 +30,15 @@ void UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTo
 	EffectContext.AddSourceObject(Giver);
 
 	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(Effect, 1, EffectContext);
-
+	FActiveGameplayEffectHandle EffectHandle;
+	
 	if(EffectSpecHandle.IsValid())
 	{
 		TObjectPtr<UTopDownerGameplayEffect> effect = EffectRef.GetDefaultObject();
-		FActiveGameplayEffectHandle EffectHandle = ApplyGameplayEffectToSelf(effect, 1, EffectContext);
+		EffectHandle = ApplyGameplayEffectToSelf(effect, 1, EffectContext);
 	}
+
+	return EffectHandle.IsValid();
 }
 
 int UTopDownerAbilitySystemComponent::RunEvent(FGameplayTag EventTag, const FGameplayEventData Payload)

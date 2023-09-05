@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Nodes/FlowNode.h"
+#include "TopDowner/Subsystems/Hacking/HackingSubsystem.h"
 #include "HackingSequence.generated.h"
 
 /**
@@ -18,19 +19,7 @@ public:
 	UHackingSequence();
 
 	UPROPERTY(EditAnywhere)
-	float PointsRequired;
-
-	UPROPERTY(EditAnywhere)
-	float PointsGainedPerSlotCharged;
-
-	UPROPERTY(EditAnywhere)
-	int NumberOfBatteriesToSpawn;
-
-	UPROPERTY(EditAnywhere)
-	FGameplayTagContainer BatterySlotsIdentityTags;
-	
-	UPROPERTY(EditAnywhere)
-	FGameplayTagContainer BatterySpawnPointsIdentityTags;
+	FHackingStartStructData Data;
 
 	virtual void ExecuteInput(const FName& PinName) override;
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "HackingSequenceObject.generated.h"
 
@@ -13,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHackingAmmountCallback, float, Hac
  * 
  */
 UCLASS()
-class TOPDOWNER_API UHackingSequenceObject : public UObject
+class TOPDOWNER_API AHackingSequenceObject : public AActor
 {
 	GENERATED_BODY()
 
@@ -33,10 +34,20 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void AddBatteryPower(float PowerToAdd);
-	
+
+	void GatherBatterySlots(FGameplayTagContainer IdentityTags);
+	void GatherBatteries(FGameplayTagContainer IdentityTags);
 	void BeginHacking();
+	
+	
 	void EndHacking();
 
+	UPROPERTY(BlueprintReadOnly)
+	TArray<AActor*> BatterySlots;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<AActor*> Batteries;
+	
 	UPROPERTY(BlueprintAssignable)
 	FHackingCallback OnHackingFinished;
 

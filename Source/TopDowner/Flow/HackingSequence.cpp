@@ -25,12 +25,10 @@ void UHackingSequence::ExecuteInput(const FName& PinName)
 {
 	if(UHackingSubsystem * HackingSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UHackingSubsystem>())
 	{
-		HackingSubsystem->PrepareHacking();
+		HackingSubsystem->PrepareHacking(GetWorld(), Data);
 
-		if( UHackingSequenceObject* Obj = HackingSubsystem->CurrentCombat )
+		if( AHackingSequenceObject* Obj = HackingSubsystem->CurrentCombat )
 		{
-			Obj->PointsRequired = PointsRequired;
-			Obj->PointsGainedPerSlotCharged = PointsGainedPerSlotCharged;
 			Obj->OnHackingFinished.AddDynamic(this, &UHackingSequence::UHackingSequence::OnHackingDone);
 		}
 
@@ -45,14 +43,10 @@ void UHackingSequence::OnHackingDone()
 {
 	if(UHackingSubsystem * HackingSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UHackingSubsystem>())
 	{
-		HackingSubsystem->PrepareHacking();
-
-		if( UHackingSequenceObject* Obj = HackingSubsystem->CurrentCombat )
+		if( AHackingSequenceObject* Obj = HackingSubsystem->CurrentCombat )
 		{
 			Obj->OnHackingFinished.RemoveDynamic(this, &UHackingSequence::UHackingSequence::OnHackingDone);
 		}
-
-		HackingSubsystem->BeginHacking();
 	}
 	
 	TriggerOutput(*OutputAfterHackingSuccess, true);

@@ -15,7 +15,8 @@
 				"Flow",
 				"CoreUObject",
 				"DeveloperSettings",
-				"FlowEditor"
+				"FlowEditor",
+				"UMG"
 			]
 		}
 	],
@@ -97,6 +98,10 @@
 		},
 		{
 			"Name": "MotionWarping",
+			"Enabled": true
+		},
+		{
+			"Name": "Objectives",
 			"Enabled": true
 		}
 	]

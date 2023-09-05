@@ -3,11 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "HackingSequenceObject.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "HackingSubsystem.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHackingObjectChange, UHackingSequenceObject*, Object);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHackingObjectChange, AHackingSequenceObject*, Object);
+
+USTRUCT(Blueprintable)
+struct FHackingStartStructData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	float PointsRequired;
+
+	UPROPERTY(EditAnywhere)
+	float PointsGainedPerSlotCharged;
+
+	UPROPERTY(EditAnywhere)
+	int NumberOfBatteriesToSpawn;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer BatterySlotsIdentityTags;
+	
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer BatteryIdentityTags;
+};
 
 /**
  * 
@@ -19,10 +41,10 @@ class TOPDOWNER_API UHackingSubsystem : public UGameInstanceSubsystem
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UHackingSequenceObject> CurrentCombat;
+	AHackingSequenceObject* CurrentCombat;
 
 	UFUNCTION(BlueprintCallable)
-	void PrepareHacking();
+	void PrepareHacking(UWorld* world, FHackingStartStructData Data);
 	
 	UFUNCTION(BlueprintCallable)
 	void BeginHacking();

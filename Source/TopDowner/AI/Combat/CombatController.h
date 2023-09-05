@@ -19,11 +19,17 @@ class IAICombatInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
+	bool ActivateByEnum(EActivationType Activation);
+	virtual bool ActivateByEnum_Implementation(EActivationType Activation){return false;}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateLow();
 	virtual bool ActivateLow_Implementation(){return false;}
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateHigh();
 	virtual bool ActivateHigh_Implementation(){return false;}
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateNone();
 	virtual bool ActivateNone_Implementation(){return false;}

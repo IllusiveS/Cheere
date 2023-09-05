@@ -5,9 +5,12 @@
 
 #include "HackingSequenceObject.h"
 
-void UHackingSubsystem::PrepareHacking()
+void UHackingSubsystem::PrepareHacking(UWorld* world, FHackingStartStructData Data)
 {
-	CurrentCombat = NewObject<UHackingSequenceObject>();
+	CurrentCombat = world->SpawnActor<AHackingSequenceObject>(AHackingSequenceObject::StaticClass());
+	CurrentCombat->PointsRequired = Data.PointsRequired;
+	CurrentCombat->GatherBatteries(Data.BatteryIdentityTags);
+	CurrentCombat->GatherBatterySlots(Data.BatterySlotsIdentityTags);
 }
 
 void UHackingSubsystem::BeginHacking()

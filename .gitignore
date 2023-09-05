@@ -50,5 +50,5 @@ Session.vim
 # Visual Studio
 .vs
 
-*/Intermediate/*
-*/Build/*
+**/Intermediate/*
+**/Binaries/*

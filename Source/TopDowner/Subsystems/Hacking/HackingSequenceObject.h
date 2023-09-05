@@ -43,10 +43,10 @@ public:
 	void EndHacking();
 
 	UPROPERTY(BlueprintReadOnly)
-	TArray<AActor*> BatterySlots;
+	TArray<class ABatterySlot*> BatterySlots;
 
 	UPROPERTY(BlueprintReadOnly)
-	TArray<AActor*> Batteries;
+	TArray<class ABatteryOnGround*> Batteries;
 	
 	UPROPERTY(BlueprintAssignable)
 	FHackingCallback OnHackingFinished;

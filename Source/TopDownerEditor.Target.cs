@@ -11,5 +11,6 @@ public class TopDownerEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_2;
 		ExtraModuleNames.Add("TopDowner");
+		ExtraModuleNames.Add("TopDownerEditor");
 	}
 }

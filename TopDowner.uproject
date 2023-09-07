@@ -18,6 +18,15 @@
 				"FlowEditor",
 				"UMG"
 			]
+		},
+		{
+			"Name": "TopDownerEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"TopDowner",
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [

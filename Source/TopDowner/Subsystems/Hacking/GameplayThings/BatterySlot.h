@@ -1,4 +1,5 @@
-﻿#include "BatterySlot.generated.h"
+﻿#pragma once
+#include "BatterySlot.generated.h"
 
 /** Please add a class description */
 UCLASS(Blueprintable, BlueprintType)

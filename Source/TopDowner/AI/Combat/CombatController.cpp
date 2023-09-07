@@ -283,6 +283,15 @@ void ACombatController::ReactToEnemyDied(AEnemyRobot* Enemy)
 	Enemy->OnEnemyDeactivated.RemoveDynamic(this, &ACombatController::ReactToEnemyDeactivated);
 }
 
+int ACombatController::GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const
+{
+	if(EnemiesAmounts.Contains(ClassToTest))
+	{
+		return EnemiesAmounts[ClassToTest];
+	}
+	return 0;
+}
+
 void ACombatController::AddEnemyToAmountMap(AEnemyRobot* NewRobot)
 {
 	if (EnemiesAmounts.Contains(NewRobot->GetClass()))

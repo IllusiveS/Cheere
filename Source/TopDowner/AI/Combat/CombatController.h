@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "TopDowner/EnemyEnums.h"
+#include "GameplayTagContainer.h"
 #include "CombatController.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -91,6 +92,8 @@ public:
 	int GetNumberOfActiveBasicEnemies() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetNumberOfActiveMeleeEnemies() const;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow")
+	FGameplayTagContainer IdentityTags;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveSpecialEnemy() const;
@@ -107,6 +110,9 @@ public:
 	void ReactToEnemyDeactivated(class AEnemyRobot* Enemy);
 	UFUNCTION()
 	void ReactToEnemyDied(class AEnemyRobot* Enemy);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const;
 	
 protected:
 	UPROPERTY()

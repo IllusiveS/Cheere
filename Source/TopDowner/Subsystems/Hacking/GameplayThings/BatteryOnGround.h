@@ -1,4 +1,5 @@
-﻿#include "BatteryOnGround.generated.h"
+﻿#pragma once
+#include "BatteryOnGround.generated.h"
 
 /** Please add a class description */
 UCLASS(Blueprintable, BlueprintType)

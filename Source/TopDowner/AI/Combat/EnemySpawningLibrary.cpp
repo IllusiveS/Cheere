@@ -10,6 +10,7 @@
 
 void UEnemySpawningLibrary::SpawnEnemy(UObject* WorldContextObject, FEnemySpawnData SpawnData)
 {
+	auto World = WorldContextObject->GetWorld();
 	if (const UFlowSubsystem* FlowSubsystem = WorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UFlowSubsystem>())
 	{
 		auto Components = FlowSubsystem->GetComponents<UFlowComponent>(SpawnData.SpawnerIdentityTags, SpawnData.MatchType, true).Array();
@@ -18,7 +19,7 @@ void UEnemySpawningLibrary::SpawnEnemy(UObject* WorldContextObject, FEnemySpawnD
 		{
 			auto WholeSpawnNumber = 0;
 
-			auto FinishSpawnFunction = [SpawnData](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
+			auto FinishSpawnFunction = [SpawnData, World](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
 			{
 				auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
 								,&target->GetOwner()->GetTransform());
@@ -37,7 +38,10 @@ void UEnemySpawningLibrary::SpawnEnemy(UObject* WorldContextObject, FEnemySpawnD
 				auto Enemy = IEnemySpawnerInterface::Execute_GetSpawnedEnemy(Spawner);
 				if (SpawnData.ShouldAutoActivate)
 				{
-					Enemy->SpawnDefaultController();
+					FTimerHandle TimerHandle;
+					FTimerDelegate Delegate;
+					Delegate.BindUFunction(Enemy, "SpawnDefaultController");
+					World->GetWorld()->GetTimerManager().SetTimer(TimerHandle, Delegate, 0.5, false);
 				}
 				
 			};

@@ -3,6 +3,7 @@
 
 #include "CombatController.h"
 
+#include "BrainComponent.h"
 #include "Algo/Accumulate.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "TopDowner/EnemyRobot.h"
@@ -11,12 +12,12 @@
 
 void ACombatController::BeginCombat()
 {
-	
+	//GetBrainComponent()->StartLogic();
 }
 
 void ACombatController::EndCombat()
 {
-	
+	GetBrainComponent()->StopLogic("Combat End");
 }
 
 void ACombatController::AddGroupToCombat(AEnemyGroup* NewGroup)
@@ -276,6 +277,7 @@ void ACombatController::ReactToEnemyDied(AEnemyRobot* Enemy)
 	HighActiveEnemiesInCombat.Remove(Enemy);
 	LowActiveEnemiesInCombat.Remove(Enemy);
 	AllEnemiesInCombat.Remove(Enemy);
+	RemoveEnemyRobotFromAmountMap(Enemy);
 
 	Enemy->OnEnemyDead.RemoveDynamic(this, &ACombatController::ReactToEnemyDied);
 	Enemy->OnEnemyActivatedHigh.RemoveDynamic(this, &ACombatController::ReactToEnemyActivatedHigh);

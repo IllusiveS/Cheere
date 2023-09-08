@@ -24,7 +24,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ACombatController> CombatController;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void StartCombat();
 
 	UFUNCTION()

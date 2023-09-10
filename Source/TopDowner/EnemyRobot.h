@@ -11,6 +11,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyRobotDelegate, AEnemyRobot*, Robot);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEnemyRobotActivationDelegate, AEnemyRobot*, Robot, EActivationType, Activation);
+
 UCLASS()
 class TOPDOWNER_API AEnemyRobot : public ACharacter, public IAICombatInterface
 {
@@ -39,11 +41,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(BlueprintReadWrite)
-	TEnumAsByte<EEnemyType> EnemyType{EEnemyType::Basic};
+	EEnemyType EnemyType{EEnemyType::Basic};
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	bool IsActivated() const;
 	UPROPERTY(BlueprintReadWrite)
-	TEnumAsByte<EActivationType> ActivationType { EActivationType::None };
+	EActivationType ActivationType { EActivationType::None };
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Instanced, Category = "Attributes")
 	TObjectPtr<class UBasicCharacterAttributeSet> BasicEntityAttributes;
@@ -68,6 +70,10 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	FVector LastDmgDir;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool ActivateByEnum(EActivationType Activation);
+	virtual bool ActivateByEnum_Implementation(EActivationType Activation) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool ActivateLow();
@@ -87,11 +93,7 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FEnemyRobotDelegate OnEnemyDead;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FEnemyRobotDelegate OnEnemyActivatedLow;
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FEnemyRobotDelegate OnEnemyActivatedHigh;
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FEnemyRobotDelegate OnEnemyDeactivated;
+	FEnemyRobotActivationDelegate OnEnemyActivated;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetTargetPosition(FVector targetPos);

@@ -10,7 +10,7 @@ enum class EActivationType : uint8
 };
 
 UENUM(BlueprintType)
-enum EEnemyType : uint8
+enum class EEnemyType : uint8
 {
 	Basic,
 	Melee,

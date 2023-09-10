@@ -108,13 +108,11 @@ AEnemyGroup* ACombatController::FindNearestAcceptableGroup(AEnemyRobot* Enemy)
 void ACombatController::AddEnemyToCombat(AEnemyRobot* NewRobot)
 {
 	AllEnemiesInCombat.Add(NewRobot);
-	NotActiveEnemiesInCombat.Add(NewRobot);
+	EnemyActivations.Add(NewRobot, EActivationType::None);
 	AddEnemyToAmountMap(NewRobot);
 
 	NewRobot->OnEnemyDead.AddDynamic(this, &ACombatController::ReactToEnemyDied);
-	NewRobot->OnEnemyActivatedHigh.AddDynamic(this, &ACombatController::ReactToEnemyActivatedHigh);
-	NewRobot->OnEnemyActivatedLow.AddDynamic(this, &ACombatController::ReactToEnemyActivatedLow);
-	NewRobot->OnEnemyDeactivated.AddDynamic(this, &ACombatController::ReactToEnemyDeactivated);
+	NewRobot->OnEnemyActivated.AddDynamic(this, &ACombatController::ReactToEnemyActivationChange);
 }
 
 void ACombatController::AddRequiredEnemyToCombat(AEnemyRobot* NewRobot)
@@ -145,7 +143,7 @@ void ACombatController::Tick(float DeltaSeconds)
 	}
 }
 
-AEnemyRobot* ACombatController::GetRandomUnactiveEnemy(TEnumAsByte<EEnemyType> EnemyType) const
+AEnemyRobot* ACombatController::GetRandomUnactiveEnemy(EEnemyType EnemyType) const
 {
 	AEnemyRobot* EnemyToReturn = nullptr;
 
@@ -251,38 +249,34 @@ int ACombatController::GetNumberOfActiveSpecialEnemies()
 	});
 	return ReturnValue;
 }
+void ACombatController::ReactToEnemyActivationChange(AEnemyRobot* Enemy, EActivationType Activation)
+{
+	EnemyActivations[Enemy] = Activation;
+}
 
 void ACombatController::ReactToEnemyActivatedLow(AEnemyRobot* Enemy)
 {
-	NotActiveEnemiesInCombat.Remove(Enemy);
-	LowActiveEnemiesInCombat.Add(Enemy);
+	ReactToEnemyActivationChange(Enemy, EActivationType::Low);
 }
 
 void ACombatController::ReactToEnemyActivatedHigh(AEnemyRobot* Enemy)
 {
-	NotActiveEnemiesInCombat.Remove(Enemy);
-	HighActiveEnemiesInCombat.Add(Enemy);
+	ReactToEnemyActivationChange(Enemy, EActivationType::High);
 }
 
 void ACombatController::ReactToEnemyDeactivated(AEnemyRobot* Enemy)
 {
-	NotActiveEnemiesInCombat.Add(Enemy);
-	HighActiveEnemiesInCombat.Remove(Enemy);
-	LowActiveEnemiesInCombat.Remove(Enemy);
+	ReactToEnemyActivationChange(Enemy, EActivationType::None);
 }
 
 void ACombatController::ReactToEnemyDied(AEnemyRobot* Enemy)
 {
-	NotActiveEnemiesInCombat.Remove(Enemy);
-	HighActiveEnemiesInCombat.Remove(Enemy);
-	LowActiveEnemiesInCombat.Remove(Enemy);
 	AllEnemiesInCombat.Remove(Enemy);
+	EnemyActivations.Remove(Enemy);
 	RemoveEnemyRobotFromAmountMap(Enemy);
 
 	Enemy->OnEnemyDead.RemoveDynamic(this, &ACombatController::ReactToEnemyDied);
-	Enemy->OnEnemyActivatedHigh.RemoveDynamic(this, &ACombatController::ReactToEnemyActivatedHigh);
-	Enemy->OnEnemyActivatedLow.RemoveDynamic(this, &ACombatController::ReactToEnemyActivatedLow);
-	Enemy->OnEnemyDeactivated.RemoveDynamic(this, &ACombatController::ReactToEnemyDeactivated);
+	Enemy->OnEnemyActivated.RemoveDynamic(this, &ACombatController::ReactToEnemyActivationChange);
 }
 
 int ACombatController::GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const

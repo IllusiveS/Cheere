@@ -83,7 +83,7 @@ public:
 
 	//Single Unit Controls
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	class AEnemyRobot* GetRandomUnactiveEnemy(TEnumAsByte<EEnemyType> EnemyType) const;
+	class AEnemyRobot* GetRandomUnactiveEnemy(EEnemyType EnemyType) const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveBasicEnemy() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -110,6 +110,9 @@ public:
 	void ReactToEnemyDeactivated(class AEnemyRobot* Enemy);
 	UFUNCTION()
 	void ReactToEnemyDied(class AEnemyRobot* Enemy);
+	
+	UFUNCTION()
+	void ReactToEnemyActivationChange(class AEnemyRobot* Enemy, EActivationType Activation);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const;
@@ -133,12 +136,9 @@ protected:
 	//TODO turn to sets?
 	UPROPERTY()
 	TSet<class AEnemyRobot*> AllEnemiesInCombat;
+
 	UPROPERTY()
-	TArray<class AEnemyRobot*> NotActiveEnemiesInCombat;
-	UPROPERTY()
-	TArray<class AEnemyRobot*> LowActiveEnemiesInCombat;
-	UPROPERTY()
-	TArray<class AEnemyRobot*> HighActiveEnemiesInCombat;
+	TMap<class AEnemyRobot*, EActivationType> EnemyActivations;
 
 	UPROPERTY()
 	TArray<class AEnemyRobot*> AllEnemiesInCombatRequired;

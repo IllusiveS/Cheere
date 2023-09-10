@@ -4,6 +4,7 @@
 #include "HackingSequenceObject.h"
 
 #include "FlowSubsystem.h"
+#include "GameplayThings/BatteryOnGround.h"
 #include "GameplayThings/BatterySlot.h"
 
 void AHackingSequenceObject::AddBatteryPower(float PowerToAdd)
@@ -46,8 +47,8 @@ void AHackingSequenceObject::GatherBatteries(FGameplayTagContainer IdentityTags)
 			for (auto Slot : BatterySlotsFlows)
 			{
 				if (Slot.IsValid() == false) continue;
-				if (auto Actor = Cast<ABatterySlot>(Slot.Get()->GetOuter())) {
-					BatterySlots.Add(Actor);
+				if (auto Actor = Cast<ABatteryOnGround>(Slot.Get()->GetOuter())) {
+					Batteries.Add(Actor);
 				}
 			}
 		}
@@ -57,6 +58,18 @@ void AHackingSequenceObject::GatherBatteries(FGameplayTagContainer IdentityTags)
 void AHackingSequenceObject::BeginHacking()
 {
 	
+}
+
+ABatteryOnGround* AHackingSequenceObject::GetBatteryToSteal()
+{
+	for (auto Battery : Batteries)
+	{
+		if (Battery->IsBeingUsed)
+		{
+			return Battery;
+		}
+	}
+	return nullptr;
 }
 
 void AHackingSequenceObject::EndHacking()

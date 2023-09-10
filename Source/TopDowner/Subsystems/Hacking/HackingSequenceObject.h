@@ -38,7 +38,9 @@ public:
 	void GatherBatterySlots(FGameplayTagContainer IdentityTags);
 	void GatherBatteries(FGameplayTagContainer IdentityTags);
 	void BeginHacking();
-	
+
+	UFUNCTION(BlueprintPure)
+	class ABatteryOnGround* GetBatteryToSteal();
 	
 	void EndHacking();
 

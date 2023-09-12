@@ -288,6 +288,27 @@ int ACombatController::GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const
 	return 0;
 }
 
+int ACombatController::GetDesiredNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const
+{
+	if(DesiredEnemies.Contains(ClassToTest))
+	{
+		return DesiredEnemies[ClassToTest];
+	}
+	return 0;
+}
+
+int ACombatController::GetNumOfEnemiesByActivation(EActivationType Activation) const
+{
+	TArray<EActivationType> Activations;
+	int FoundAmmount = 0;
+	EnemyActivations.GenerateValueArray(Activations);
+	for (auto Act : Activations)
+	{
+			if (Act == Activation) FoundAmmount++;
+	}
+	return FoundAmmount;
+}
+
 void ACombatController::AddEnemyToAmountMap(AEnemyRobot* NewRobot)
 {
 	if (EnemiesAmounts.Contains(NewRobot->GetClass()))

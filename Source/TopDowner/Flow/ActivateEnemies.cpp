@@ -24,7 +24,7 @@ void UActivateEnemies::ExecuteInput(const FName& PinName)
 	}
 	if (UCombatControllerSubsystem* CombatSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UCombatControllerSubsystem>())
 	{
-		CombatSubsystem->StartCombat();
+		//CombatSubsystem->StartCombat();
 	}
 	
 	TriggerFirstOutput(true);

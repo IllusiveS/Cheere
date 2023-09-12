@@ -19,13 +19,13 @@ public:
 	UCombatControllerSubsystem();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UBehaviorTree* CombatTree;
+	class UBehaviorTree* CombatTree{nullptr};
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ACombatController> CombatController;
 
 	UFUNCTION(BlueprintCallable)
-	void StartCombat();
+	void StartCombat(TMap<TSubclassOf<class AEnemyRobot>, int> DesiredEnemies);
 
 	UFUNCTION()
 	void EndCombat();

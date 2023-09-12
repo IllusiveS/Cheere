@@ -13,7 +13,7 @@ UCombatControllerSubsystem::UCombatControllerSubsystem()
 {
 }
 
-void UCombatControllerSubsystem::StartCombat()
+void UCombatControllerSubsystem::StartCombat(TMap<TSubclassOf<AEnemyRobot>, int> DesiredEnemies)
 {
 	CombatController->RunBehaviorTree(CombatTree);
 
@@ -23,6 +23,7 @@ void UCombatControllerSubsystem::StartCombat()
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredSpecialEnemiesActive", SGSettings->DesiredSpecialEnemyAmount);
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredBasicEnemiesActive", SGSettings->DesiredBasicEnemyAmount);
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredNumberOfMeleeActive", SGSettings->DesiredMeleeEnemyAmount);
+	CombatController->DesiredEnemies = DesiredEnemies;
 	CombatController->BeginCombat();
 }
 

@@ -116,6 +116,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetDesiredNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const;
+
+	UFUNCTION(BlueprintPure)
+	int GetNumOfEnemiesByActivation(EActivationType Activation) const;
+
+	UPROPERTY()
+	TMap<TSubclassOf<AEnemyRobot>, int> DesiredEnemies;
 	
 protected:
 	UPROPERTY()

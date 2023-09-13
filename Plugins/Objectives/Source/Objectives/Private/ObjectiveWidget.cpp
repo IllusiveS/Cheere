@@ -30,5 +30,17 @@ void UObjectiveWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UObjectiveWidget::UpdateVisibilityState()
 {
-	SetVisibility(IsOnCorrectLayer && IsActive ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	const auto NewVisibilityState = IsOnCorrectLayer && IsActive ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
+	if(NewVisibilityState != GetVisibility())
+	{
+		if(NewVisibilityState == ESlateVisibility::Visible)
+		{
+			OnShow();
+		}
+		else
+		{
+			OnHide();
+		}
+		SetVisibility(NewVisibilityState);
+	}
 }

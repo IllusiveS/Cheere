@@ -28,4 +28,10 @@ public:
 	
 	bool IsOnCorrectLayer {false};
 	bool IsActive {true};
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnShow();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHide();
 };

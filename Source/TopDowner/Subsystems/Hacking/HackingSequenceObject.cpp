@@ -89,7 +89,8 @@ void AHackingSequenceObject::ReactToBatteryStateChange(ABatteryOnGround* Battery
 		if (Battery->IsBeingUsed)
 		{
 			Objectives->MakeObjectiveUnactive(Battery);
-		} else
+		}
+		else
 		{
 			Objectives->MakeObjectiveActive(Battery);
 		}

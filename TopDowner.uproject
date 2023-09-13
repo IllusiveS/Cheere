@@ -15,7 +15,6 @@
 				"Flow",
 				"CoreUObject",
 				"DeveloperSettings",
-				"FlowEditor",
 				"UMG"
 			]
 		},
@@ -24,6 +23,7 @@
 			"Type": "Editor",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
+				"FlowEditor",
 				"TopDowner",
 				"Engine"
 			]

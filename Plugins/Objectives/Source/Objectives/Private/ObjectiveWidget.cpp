@@ -10,6 +10,7 @@ void UObjectiveWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	UpdateVisibilityState();
 	// auto Controller = UGameplayStatics::GetPlayerController(this, 0);
 	// FVector2d Pos;
 	// Controller->ProjectWorldLocationToScreen(ActorToFollow->GetActorLocation(), Pos);
@@ -25,4 +26,9 @@ void UObjectiveWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	// );
 	//
 	// SetPositionInViewport(ClampedSize);
+}
+
+void UObjectiveWidget::UpdateVisibilityState()
+{
+	SetVisibility(IsOnCorrectLayer && IsActive ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }

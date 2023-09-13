@@ -9,6 +9,8 @@
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AI/Combat/CombatController.h"
+#include "AI/Combat/CombatControllerSubsystem.h"
 #include "GAS/TopDownerAbilitySystemComponent.h"
 
 ATopDownerPlayerController::ATopDownerPlayerController()
@@ -27,6 +29,14 @@ void ATopDownerPlayerController::BeginPlay()
 	auto GASComponent = Cast<ATopDownerCharacter>(GetPawn())->AbilitySystemComponent;
 	//const auto FireAbilitySpec = GASComponent->BuildAbilitySpecFromClass(FireAbility, 0, 5);
 	//GASComponent->GiveAbility(FireAbilitySpec);
+}
+
+void ATopDownerPlayerController::StopRandomSpawning()
+{
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(this))
+	{
+		CombatController->DesiredEnemies.Empty();
+	}
 }
 
 void ATopDownerPlayerController::SetupInputComponent()

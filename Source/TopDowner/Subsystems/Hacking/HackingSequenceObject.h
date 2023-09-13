@@ -44,6 +44,11 @@ public:
 	
 	void EndHacking();
 
+	UFUNCTION()
+	void ReactToBatteryStateChange(class ABatteryOnGround* Battery);
+	UFUNCTION()
+	void ReactToBatterySlotStateChange(class ABatterySlot* Battery);
+	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<class ABatterySlot*> BatterySlots;
 
@@ -55,4 +60,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FHackingAmmountCallback OnHackingStatusChange;
+
+	virtual void Tick(float DeltaSeconds) override;
 };

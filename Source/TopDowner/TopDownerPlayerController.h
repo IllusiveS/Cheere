@@ -76,7 +76,11 @@ public:
 	
 	UPROPERTY(Category=Abilities, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class UTopDownerGameplayAbility> FireAbility;
-	
+
+public:
+	//CONSOLE COMMANDS
+	UFUNCTION(Exec)
+	void StopRandomSpawning();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

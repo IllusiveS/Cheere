@@ -23,4 +23,9 @@ public:
 	class UImage* ObjectiveIcon;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	void UpdateVisibilityState();
+	
+	bool IsOnCorrectLayer {false};
+	bool IsActive {true};
 };

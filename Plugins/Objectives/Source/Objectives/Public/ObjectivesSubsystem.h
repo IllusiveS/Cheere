@@ -6,6 +6,29 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "ObjectivesSubsystem.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogObjectives, Log, All);
+
+USTRUCT(Blueprintable)
+struct FObjectiveDataStruct
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadOnly)
+	class UObjectiveWidget* ObjectiveWidget;
+	UPROPERTY(BlueprintReadOnly)
+	AActor* TargetActor;
+	UPROPERTY(BlueprintReadOnly)
+	int Layer;
+};
+
+USTRUCT()
+struct FObjectiveLayerDataStruct
+{
+	GENERATED_BODY()
+public:
+	TArray<FObjectiveDataStruct> Objectives;
+};
+
 /**
  * 
  */
@@ -16,19 +39,29 @@ class OBJECTIVES_API UObjectivesSubsystem : public UGameInstanceSubsystem
 	
 public:
 	UPROPERTY()
-	UObjectivesMainWidget* Parent{nullptr};
-	
-	UPROPERTY()
-	TMap<AActor*, class UObjectiveWidget*> ObjectiveWidgets;
+	TArray<FObjectiveLayerDataStruct> ObjectiveWidgets {};
 
-	void Setup(AActor* Actor, TSubclassOf<UObjectivesMainWidget> MainClass);
+	int CurrentLayer = 0;
+
+	int GetCurrentLayer() const;
+	UFUNCTION()
+	void SetLayer(int NewLayer);
+	UFUNCTION(BlueprintCallable)
+	void PushLayer();
+	UFUNCTION(BlueprintCallable)
+	void PopLayer();
 	
 	UFUNCTION(BlueprintCallable)
-	void AddObjective(AActor* Actor, UTexture2D* Texture, TSubclassOf<UObjectiveWidget> ObjectiveWidget, TSubclassOf<UObjectivesMainWidget> MainClass);
+	void AddObjective(AActor* Actor, UTexture2D* Texture, TSubclassOf<UObjectiveWidget> ObjectiveWidget);
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveObjective(AActor* Actor);
 
+	void MakeObjectiveActive(AActor* Actor);
+	void MakeObjectiveUnactive(AActor* Actor);
+
+	void AddToWidgetsMap(const FObjectiveDataStruct &Data);
+	
 	UFUNCTION(BlueprintCallable)
 	void RemoveAllObjectives();
 };

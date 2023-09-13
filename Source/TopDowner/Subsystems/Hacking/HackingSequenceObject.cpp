@@ -4,6 +4,7 @@
 #include "HackingSequenceObject.h"
 
 #include "FlowSubsystem.h"
+#include "ObjectivesSubsystem.h"
 #include "GameplayThings/BatteryOnGround.h"
 #include "GameplayThings/BatterySlot.h"
 
@@ -30,6 +31,8 @@ void AHackingSequenceObject::GatherBatterySlots(FGameplayTagContainer IdentityTa
 				if (Slot.IsValid() == false) continue;
 				if (ABatterySlot* Actor = Cast<ABatterySlot>(Slot.Get()->GetOuter())) {
 					BatterySlots.Add(Actor);
+					Actor->OnStateChange.AddDynamic(this, &AHackingSequenceObject::ReactToBatterySlotStateChange);
+					ReactToBatterySlotStateChange(Actor);
 				}
 			}
 		}
@@ -49,6 +52,8 @@ void AHackingSequenceObject::GatherBatteries(FGameplayTagContainer IdentityTags)
 				if (Slot.IsValid() == false) continue;
 				if (auto Actor = Cast<ABatteryOnGround>(Slot.Get()->GetOuter())) {
 					Batteries.Add(Actor);
+					Actor->OnStateChange.AddDynamic(this, &AHackingSequenceObject::ReactToBatteryStateChange);
+					ReactToBatteryStateChange(Actor);
 				}
 			}
 		}
@@ -75,4 +80,38 @@ ABatteryOnGround* AHackingSequenceObject::GetBatteryToSteal()
 void AHackingSequenceObject::EndHacking()
 {
 	OnHackingFinished.Broadcast();
+}
+
+void AHackingSequenceObject::ReactToBatteryStateChange(ABatteryOnGround* Battery)
+{
+	if (const auto Objectives = GetWorld()->GetGameInstance()->GetSubsystem<UObjectivesSubsystem>())
+	{
+		if (Battery->IsBeingUsed)
+		{
+			Objectives->MakeObjectiveUnactive(Battery);
+		} else
+		{
+			Objectives->MakeObjectiveActive(Battery);
+		}
+	}
+}
+
+void AHackingSequenceObject::ReactToBatterySlotStateChange(ABatterySlot* BatterySlot)
+{
+	if (const auto Objectives = GetWorld()->GetGameInstance()->GetSubsystem<UObjectivesSubsystem>())
+	{
+		if (BatterySlot->IsActive)
+		{
+			Objectives->MakeObjectiveUnactive(BatterySlot);
+		} else
+		{
+			Objectives->MakeObjectiveActive(BatterySlot);
+		}
+	}
+}
+
+void AHackingSequenceObject::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	//TODO update objectives
 }

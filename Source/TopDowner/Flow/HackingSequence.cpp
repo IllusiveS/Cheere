@@ -3,6 +3,7 @@
 
 #include "HackingSequence.h"
 
+#include "ObjectivesSubsystem.h"
 #include "TopDowner/Subsystems/Hacking/HackingSequenceObject.h"
 #include "TopDowner/Subsystems/Hacking/HackingSubsystem.h"
 

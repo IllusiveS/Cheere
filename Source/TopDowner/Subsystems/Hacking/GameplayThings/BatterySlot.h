@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "BatterySlot.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBatterySlotStateChange, class ABatterySlot*, BatterySlot);
+
 /** Please add a class description */
 UCLASS(Blueprintable, BlueprintType)
 class ABatterySlot : public AActor
@@ -28,4 +30,7 @@ public:
 	/** Please add a variable description */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default")
 	bool IsActive;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FOnBatterySlotStateChange OnStateChange;
 };

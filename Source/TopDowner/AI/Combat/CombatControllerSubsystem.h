@@ -17,7 +17,7 @@ class TOPDOWNER_API UCombatControllerSubsystem : public UGameInstanceSubsystem
 
 public:
 	UCombatControllerSubsystem();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UBehaviorTree* CombatTree{nullptr};
 	

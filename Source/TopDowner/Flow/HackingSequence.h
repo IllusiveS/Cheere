@@ -23,6 +23,9 @@ public:
 
 	virtual void ExecuteInput(const FName& PinName) override;
 
+	UPROPERTY(EditAnywhere)
+	UTexture2D* BatteryObjectiveTexture;
+	
 	UFUNCTION()
 	void OnHackingDone();
 };

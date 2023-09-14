@@ -97,6 +97,12 @@ UAbilitySystemComponent* ATopDownerCharacter::GetAbilitySystemComponent() const
 void ATopDownerCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+	if (IsAiming)
+	{
+		const FInputActionValue Value;
+		Aim(Value);
+	}
 	//
 	// if(GEngine)
 	// 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DeltaSeconds * 35.0));	

@@ -15,7 +15,8 @@
 				"Flow",
 				"CoreUObject",
 				"DeveloperSettings",
-				"UMG"
+				"UMG",
+				"EnhancedInput"
 			]
 		},
 		{

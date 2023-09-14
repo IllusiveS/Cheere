@@ -18,13 +18,13 @@ public:
 	// Sets default values for this actor's properties
 	AIdentityRoom();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow", meta=(DisplayPriority="1"))
 	FGameplayTagContainer IdentityTags;
 
-	UPROPERTY(VisibleAnywhere, Category = "Flow")
+	UPROPERTY(VisibleAnywhere, Category = "Flow", meta=(DisplayPriority="1", DisplayAfter="Transform"))
 	TObjectPtr<class UBoxComponent> RoomRange;
 
-	UFUNCTION(CallInEditor, Category = "Flow")
+	UFUNCTION(CallInEditor, Category = "Flow", meta=(DisplayPriority="1", DisplayAfter="Transform"))
 	void UpdateFlowComponents();
 	
 protected:

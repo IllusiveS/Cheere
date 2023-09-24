@@ -19,18 +19,22 @@ class TOPDOWNER_API AHackingSequenceObject : public AActor
 	GENERATED_BODY()
 
 public:
+	AHackingSequenceObject();
 	
 	UPROPERTY()
-	float CurrentPoints;
+	float CurrentPoints {0.0f};
 	
 	UPROPERTY(EditAnywhere)
-	float PointsRequired;
+	float PointsRequired {0.0f};
 
 	UPROPERTY(EditAnywhere)
-	float PointsGainedPerSlotCharged;
+	float PointsGainedPerSlotCharged {0.0f};
 
 	UPROPERTY(EditAnywhere)
-	int NumberOfBatteriesToSpawn;
+	float BaseGain {0.1f};
+	
+	UPROPERTY(EditAnywhere)
+	int NumberOfBatteriesToSpawn {0};
 	
 	UFUNCTION(BlueprintCallable)
 	void AddBatteryPower(float PowerToAdd);
@@ -51,6 +55,8 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<class ABatterySlot*> BatterySlots;
+	UPROPERTY()
+	TArray<class ABatterySlot*> ActiveBatterySlots;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<class ABatteryOnGround*> Batteries;

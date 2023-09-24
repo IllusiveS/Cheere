@@ -15,6 +15,10 @@ UCombatControllerSubsystem::UCombatControllerSubsystem()
 
 void UCombatControllerSubsystem::StartCombat(TMap<TSubclassOf<AEnemyRobot>, int> DesiredEnemies)
 {
+	if(CombatController == nullptr)
+	{
+		CombatController = GetWorld()->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
+	}
 	CombatController->RunBehaviorTree(CombatTree);
 
 	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
@@ -39,7 +43,6 @@ void UCombatControllerSubsystem::Initialize(FSubsystemCollectionBase& Collection
 	CombatController = GetWorld()->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
 	
 	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
-	
 	CombatTree = SGSettings->CombatTree.LoadSynchronous();
 }
 

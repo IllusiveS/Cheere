@@ -15,6 +15,9 @@ class TOPDOWNER_API UTimeDilationSlowdownSubsystem : public UGameInstanceSubsyst
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
+	void SetAimingSlowTime(float DilationAmount);
+	
+	UFUNCTION(BlueprintCallable)
 	void SlowTime(float DilationAmount, float DilationTime, bool ForceNew = false);
 
 	UFUNCTION()
@@ -22,4 +25,5 @@ public:
 
 	FTimerHandle CurrentSlowdownHandle;
 	float CurrentSlowdownAmount;
+	float CurrentAimingSlowdown {1.0f};
 };

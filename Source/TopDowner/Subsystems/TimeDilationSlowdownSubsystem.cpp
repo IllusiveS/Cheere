@@ -5,6 +5,11 @@
 
 #include "Kismet/GameplayStatics.h"
 
+void UTimeDilationSlowdownSubsystem::SetAimingSlowTime(float DilationAmount)
+{
+	CurrentAimingSlowdown = DilationAmount;
+}
+
 void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float DilationTime, bool ForceNew)
 {
 	if (GetWorld()->GetTimerManager().IsTimerActive(CurrentSlowdownHandle))
@@ -14,11 +19,11 @@ void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float Dilati
 		GetWorld()->GetTimerManager().ClearTimer(CurrentSlowdownHandle);
 	}
 
-	const auto TimerScaledTime = DilationTime * DilationAmount;
+	const auto TimerScaledTime = DilationTime * DilationAmount * CurrentAimingSlowdown;
 	GetWorld()->GetTimerManager().SetTimer(CurrentSlowdownHandle, this, &UTimeDilationSlowdownSubsystem::OnSlowTimeEnded, TimerScaledTime);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), DilationAmount);
 
-	CurrentSlowdownAmount = DilationAmount;
+	CurrentSlowdownAmount = DilationAmount * CurrentAimingSlowdown;
 }
 
 void UTimeDilationSlowdownSubsystem::OnSlowTimeEnded()

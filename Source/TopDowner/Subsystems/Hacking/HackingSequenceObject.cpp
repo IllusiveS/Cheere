@@ -8,14 +8,16 @@
 #include "GameplayThings/BatteryOnGround.h"
 #include "GameplayThings/BatterySlot.h"
 
+AHackingSequenceObject::AHackingSequenceObject()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bTickEvenWhenPaused = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+}
+
 void AHackingSequenceObject::AddBatteryPower(float PowerToAdd)
 {
-	CurrentPoints += PowerToAdd;
-	OnHackingStatusChange.Broadcast(CurrentPoints, PointsRequired);
-	if (CurrentPoints >= PointsRequired)
-	{
-		EndHacking();
-	}
+	
 }
 
 void AHackingSequenceObject::GatherBatterySlots(FGameplayTagContainer IdentityTags)
@@ -99,6 +101,15 @@ void AHackingSequenceObject::ReactToBatteryStateChange(ABatteryOnGround* Battery
 
 void AHackingSequenceObject::ReactToBatterySlotStateChange(ABatterySlot* BatterySlot)
 {
+	if (BatterySlot->IsActive)
+	{
+		ActiveBatterySlots.Emplace(BatterySlot);
+	}
+	else
+	{
+		ActiveBatterySlots.Remove(BatterySlot);
+	}
+	
 	if (const auto Objectives = GetWorld()->GetGameInstance()->GetSubsystem<UObjectivesSubsystem>())
 	{
 		if (BatterySlot->IsActive)
@@ -114,5 +125,19 @@ void AHackingSequenceObject::ReactToBatterySlotStateChange(ABatterySlot* Battery
 void AHackingSequenceObject::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	//TODO update objectives
+
+	float ValueToAdd = 0;
+	for(auto Slot : ActiveBatterySlots)
+	{
+		ValueToAdd += 1 * DeltaSeconds;
+	}
+
+	CurrentPoints += BaseGain * DeltaSeconds;
+	
+	CurrentPoints += ValueToAdd;
+	OnHackingStatusChange.Broadcast(CurrentPoints, PointsRequired);
+	if (CurrentPoints >= PointsRequired)
+	{
+		EndHacking();
+	}
 }

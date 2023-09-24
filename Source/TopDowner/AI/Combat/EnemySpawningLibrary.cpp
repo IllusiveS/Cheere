@@ -63,6 +63,9 @@ void UEnemySpawningLibrary::SpawnEnemy(UObject* WorldContextObject, FEnemySpawnD
 
 						FActorSpawnParameters params;
 
+						//FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(TEXT("Level.Train.1Platform"));
+						//ensure(target->IdentityTags.HasTag(TagRequest));
+						
 						if (SpawnData.DelayBetweenSpawns != 0.0)
 						{
 							FTimerHandle handle;

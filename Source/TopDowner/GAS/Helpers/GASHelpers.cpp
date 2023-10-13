@@ -14,6 +14,8 @@ float UGASHelpers::GetSnapshotedValue(const FGameplayEffectSpecHandle& Spec, FGa
 	Def.AttributeToCapture = Attribute;
 	const auto Attr =  Spec.Data->CapturedRelevantAttributes.FindCaptureSpecByDefinition(Def, true);
 
+	if(!Attr) return 0.0f;
+	
 	const FAggregatorEvaluateParameters EvalParams;
 	float Magnitude;
 	Attr->AttemptCalculateAttributeMagnitude(EvalParams, Magnitude);

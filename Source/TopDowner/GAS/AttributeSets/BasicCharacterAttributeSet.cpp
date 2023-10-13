@@ -55,4 +55,21 @@ void UBasicCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffec
 		const float NewHealth = GetCurrentHealth() + LocalHealingDone;
 		SetCurrentHealth(FMath::Clamp(NewHealth, 0.0f, GetMaxHealth()));
 	}
+
+	if (Data.EvaluatedData.Attribute == GetDeltaAmmoAttribute())
+    {
+    	// Store a local copy of the amount of damage done and clear the damage attribute
+    	const float LocalAmmoDelta = GetDeltaAmmo();
+    	SetDeltaAmmo(0.f);
+
+    	// Apply the health change and then clamp it
+    	const float NewAmmo = GetCurrentAmmo() + LocalAmmoDelta;
+		const float MaxAmmoValue = GetMaxAmmo();
+    	SetCurrentAmmo(FMath::Clamp(NewAmmo, 0.0f, MaxAmmoValue));
+    }
+}
+
+float UBasicCharacterAttributeSet::GetNormalizedAmmo() const
+{
+	return GetCurrentAmmo() / GetMaxAmmo();
 }

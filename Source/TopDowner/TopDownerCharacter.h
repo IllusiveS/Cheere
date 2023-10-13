@@ -20,7 +20,7 @@ public:
 	
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
-	
+	virtual void BeginPlay() override;
 	/** Returns TopDownCameraComponent subobject **/
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return IsCameraIsometric ? IsometricCameraComponent : TopDownCameraComponent; }

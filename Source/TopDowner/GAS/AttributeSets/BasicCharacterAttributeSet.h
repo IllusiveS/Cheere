@@ -46,6 +46,18 @@ public:
 	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DamageDealt)
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData MaxAmmo;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, MaxAmmo)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData CurrentAmmo;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, CurrentAmmo)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData DeltaAmmo;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DeltaAmmo)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
 	FGameplayAttributeData Speed;
 	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, Speed)
 
@@ -59,4 +71,8 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Attributes")
 	TSubclassOf<class UTopDownerGameplayEffect> DamageReceivedGameplayEffect;
+
+	UFUNCTION(BlueprintPure)
+	float GetNormalizedAmmo() const;
+
 };

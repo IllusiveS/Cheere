@@ -110,6 +110,11 @@ void ATopDownerCharacter::Tick(float DeltaSeconds)
 	GetTopDownCameraComponent()->SetFieldOfView(FMath::Lerp(GetTopDownCameraComponent()->FieldOfView, TargetFov, DeltaSeconds * 10.0));
 }
 
+void ATopDownerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 void ATopDownerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

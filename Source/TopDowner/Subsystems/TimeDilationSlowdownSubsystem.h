@@ -6,6 +6,15 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "TimeDilationSlowdownSubsystem.generated.h"
 
+
+UENUM(BlueprintType)
+enum class ESlowdownType
+{
+	E_Cutscene
+	,E_Death
+	,E_Hit
+	,E_Other
+};
 /**
  * 
  */
@@ -18,11 +27,12 @@ public:
 	void SetAimingSlowTime(float DilationAmount);
 	
 	UFUNCTION(BlueprintCallable)
-	void SlowTime(float DilationAmount, float DilationTime, bool ForceNew = false);
+	void SlowTime(float DilationAmount, float DilationTime, bool ForceNew = false, TEnumAsByte<ESlowdownType> SlowdownType = ESlowdownType::E_Other);
 
 	UFUNCTION()
 	void OnSlowTimeEnded();
-
+private:
+	ESlowdownType CurrentSlowdown;
 	FTimerHandle CurrentSlowdownHandle;
 	float CurrentSlowdownAmount;
 	float CurrentAimingSlowdown {1.0f};

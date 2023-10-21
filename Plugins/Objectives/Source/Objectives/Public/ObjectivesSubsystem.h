@@ -14,11 +14,11 @@ struct FObjectiveDataStruct
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadOnly)
-	class UObjectiveWidget* ObjectiveWidget;
+	class UObjectiveWidget* ObjectiveWidget {nullptr};
 	UPROPERTY(BlueprintReadOnly)
-	AActor* TargetActor;
+	AActor* TargetActor {nullptr};
 	UPROPERTY(BlueprintReadOnly)
-	int Layer;
+	int Layer {-1};
 };
 
 USTRUCT()

@@ -4,6 +4,7 @@
 #include "ObjectivesSubsystem.h"
 
 #include "ObjectiveWidget.h"
+#include "Algo/RemoveIf.h"
 #include "Components/Image.h"
 #include "Logging/StructuredLog.h"
 
@@ -73,20 +74,19 @@ void UObjectivesSubsystem::AddObjective(AActor* Actor, UTexture2D* Widget, TSubc
 	Data.Layer = CurrentLayer;
 	
 	AddToWidgetsMap(Data);
+
+	Actor->OnDestroyed.AddDynamic(this, &UObjectivesSubsystem::RemoveObjective);
 }
 
 void UObjectivesSubsystem::RemoveObjective(AActor* Actor)
 {
-	unimplemented();
-	// FObjectiveDataStruct FoundData;
-	// for (const auto &Data : ObjectiveWidgets)
-	// {
-	// 	if (Data.TargetActor == Actor)
-	// 	{
-	// 		FoundData = Data;
-	// 	}
-	// }
-	// ObjectiveWidgets.Remove(FoundData);
+	for (auto &Data : ObjectiveWidgets)
+	{
+		Data.Objectives.RemoveAll([&Actor](const FObjectiveDataStruct &DataStruct)
+		{
+			return Actor == DataStruct.TargetActor;
+		});
+	}
 }
 
 void UObjectivesSubsystem::MakeObjectiveActive(AActor* Actor)

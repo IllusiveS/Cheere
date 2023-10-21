@@ -10,11 +10,11 @@ void UTimeDilationSlowdownSubsystem::SetAimingSlowTime(float DilationAmount)
 	CurrentAimingSlowdown = DilationAmount;
 }
 
-void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float DilationTime, bool ForceNew)
+void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float DilationTime, bool ForceNew, TEnumAsByte<ESlowdownType> SlowdownType)
 {
 	if (GetWorld()->GetTimerManager().IsTimerActive(CurrentSlowdownHandle))
 	{
-		if (CurrentSlowdownAmount >= DilationAmount && ForceNew == false) return;
+		if (SlowdownType >= CurrentSlowdown && ForceNew == false) return;
 		
 		GetWorld()->GetTimerManager().ClearTimer(CurrentSlowdownHandle);
 	}
@@ -24,10 +24,11 @@ void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float Dilati
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), DilationAmount);
 
 	CurrentSlowdownAmount = DilationAmount * CurrentAimingSlowdown;
+	CurrentSlowdown = SlowdownType;
 }
 
 void UTimeDilationSlowdownSubsystem::OnSlowTimeEnded()
 {
-	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), CurrentAimingSlowdown);
 	GetWorld()->GetTimerManager().ClearTimer(CurrentSlowdownHandle);
 }

@@ -46,6 +46,10 @@ public:
 	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DamageDealt)
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData DeltaAmmo;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DeltaAmmo)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
 	FGameplayAttributeData MaxAmmo;
 	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, MaxAmmo)
 	
@@ -54,8 +58,28 @@ public:
 	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, CurrentAmmo)
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
-	FGameplayAttributeData DeltaAmmo;
-	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DeltaAmmo)
+	FGameplayAttributeData DeltaAPAmmo;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DeltaAPAmmo)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData MaxAmmoAP;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, MaxAmmoAP)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData CurrentAmmoAP;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, CurrentAmmoAP)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData DeltaPushbackAmmo;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, DeltaPushbackAmmo)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData MaxAmmoPushback;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, MaxAmmoPushback)
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+	FGameplayAttributeData CurrentAmmoPushback;
+	ATTRIBUTE_ACCESSORS(UBasicCharacterAttributeSet, CurrentAmmoPushback)
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
 	FGameplayAttributeData Speed;

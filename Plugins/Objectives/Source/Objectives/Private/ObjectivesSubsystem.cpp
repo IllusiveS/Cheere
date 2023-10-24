@@ -75,7 +75,7 @@ void UObjectivesSubsystem::AddObjective(AActor* Actor, UTexture2D* Widget, TSubc
 	
 	AddToWidgetsMap(Data);
 
-	Actor->OnDestroyed.AddDynamic(this, &UObjectivesSubsystem::RemoveObjective);
+	Actor->OnDestroyed.AddUniqueDynamic(this, &UObjectivesSubsystem::RemoveObjective);
 }
 
 void UObjectivesSubsystem::RemoveObjective(AActor* Actor)

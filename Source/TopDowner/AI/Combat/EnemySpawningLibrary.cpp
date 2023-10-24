@@ -21,8 +21,8 @@ void UEnemySpawningLibrary::SpawnEnemy(UObject* WorldContextObject, FEnemySpawnD
 
 			auto FinishSpawnFunction = [SpawnData, World](UFlowComponent* target, TSubclassOf<AActor> EnemySpawner, TSubclassOf<class AEnemyRobot> EnemyToSpawn)
 			{
-				auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner
-								,&target->GetOwner()->GetTransform());
+				auto transform = target->GetOwner()->GetTransform();
+				auto Spawner = target->GetOwner()->GetWorld()->SpawnActor(EnemySpawner, &transform);
 
 				if(SpawnData.EffectToGive != nullptr && SpawnData.EffectToGive->IsValidLowLevel())
 				{
@@ -62,9 +62,6 @@ void UEnemySpawningLibrary::SpawnEnemy(UObject* WorldContextObject, FEnemySpawnD
 						auto target = Components[RandIndex];
 
 						FActorSpawnParameters params;
-
-						//FGameplayTag TagRequest = FGameplayTag::RequestGameplayTag(TEXT("Level.Train.1Platform"));
-						//ensure(target->IdentityTags.HasTag(TagRequest));
 						
 						if (SpawnData.DelayBetweenSpawns != 0.0)
 						{

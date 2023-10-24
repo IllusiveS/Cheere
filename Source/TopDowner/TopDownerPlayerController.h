@@ -81,6 +81,9 @@ public:
 	//CONSOLE COMMANDS
 	UFUNCTION(Exec)
 	void StopRandomSpawning();
+	
+	UFUNCTION(Exec)
+	void KillAllEnemies();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

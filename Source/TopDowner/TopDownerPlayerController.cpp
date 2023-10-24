@@ -1,9 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TopDownerPlayerController.h"
+
+#include "EnemyRobot.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TopDownerCharacter.h"
 #include "Engine/World.h"
@@ -11,7 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "AI/Combat/CombatController.h"
 #include "AI/Combat/CombatControllerSubsystem.h"
-#include "GAS/TopDownerAbilitySystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ATopDownerPlayerController::ATopDownerPlayerController()
 {
@@ -37,6 +38,11 @@ void ATopDownerPlayerController::StopRandomSpawning()
 	{
 		CombatController->DesiredEnemies.Empty();
 	}
+}
+void ATopDownerPlayerController::KillAllEnemies()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyRobot::StaticClass(), FoundActors);
 }
 
 void ATopDownerPlayerController::SetupInputComponent()

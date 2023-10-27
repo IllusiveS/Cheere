@@ -37,7 +37,6 @@ void UHackingSubsystem::BeginHacking()
 	CurrentCombat->BeginHacking();
 	OnHackingBegin.Broadcast(CurrentCombat);
 	CurrentCombat->OnHackingFinished.AddDynamic(this, &UHackingSubsystem::FinishHacking);
-
 }
 
 void UHackingSubsystem::FinishHacking()

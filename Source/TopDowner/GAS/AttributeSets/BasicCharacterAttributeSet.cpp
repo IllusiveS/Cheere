@@ -38,7 +38,8 @@ void UBasicCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffec
                 	const auto DirNormalized = Dir.GetSafeNormal();
                 	
                 	CurrentActor->GetMesh()->SetSimulatePhysics(true);
-                	CurrentActor->GetMesh()->AddImpulse(DirNormalized * LocalDamageDone * PushbackMultiplier * FMath::RandRange(1.0, 1.9), NAME_None, true);
+                	const auto RandomPushbackVector = FVector(FMath::FRandRange(-50.0, 50.0), FMath::FRandRange(-50.0, 50.0), FMath::FRandRange(-50.0, 50.0));
+                	CurrentActor->GetMesh()->AddImpulse(DirNormalized * LocalDamageDone * PushbackMultiplier * FMath::RandRange(1.0, 1.9) + RandomPushbackVector, NAME_None, true);
                 }
 			}
 		}

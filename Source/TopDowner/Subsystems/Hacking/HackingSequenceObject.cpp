@@ -64,7 +64,8 @@ void AHackingSequenceObject::GatherBatteries(FGameplayTagContainer IdentityTags)
 
 void AHackingSequenceObject::BeginHacking()
 {
-	
+	CurrentPoints = 0.0;
+	SetActorTickEnabled(true);
 }
 
 ABatteryOnGround* AHackingSequenceObject::GetBatteryToSteal()
@@ -81,6 +82,7 @@ ABatteryOnGround* AHackingSequenceObject::GetBatteryToSteal()
 
 void AHackingSequenceObject::EndHacking()
 {
+	SetActorTickEnabled(false);
 	OnHackingFinished.Broadcast();
 }
 

@@ -13,6 +13,8 @@ void ABaseEnemyAIController::Tick(float DeltaSeconds)
 	
 	UpdateControlRotation(DeltaSeconds, false);
 
+	if (GetPawn() == nullptr) return;
+	
 	GetBlackboardComponent()->SetValueAsBool("IsActive", Cast<AEnemyRobot>(GetPawn())->IsActivated());
 
 	if( auto Enemy = Cast<AEnemyRobot>(GetPawn()))

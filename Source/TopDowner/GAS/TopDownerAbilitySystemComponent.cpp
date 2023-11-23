@@ -3,6 +3,9 @@
 
 #include "TopDownerAbilitySystemComponent.h"
 
+#include "Logging/StructuredLog.h"
+#include "TopDowner/TopDownerCharacter.h"
+
 void UTopDownerAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -16,26 +19,38 @@ void UTopDownerAbilitySystemComponent::InitCallbacks()
 
 void UTopDownerAbilitySystemComponent::InitEffects()
 {
-	for (const TSubclassOf<UTopDownerGameplayEffect> Effect : DefaultEffects)
+	for (const TSubclassOf<UTopDownerGameplayEffect> &Effect : DefaultEffects)
     {
-    	AddEffect(this, Effect);
+    	AddEffect(GetOwner(), Effect);
     }
 }
 
 bool UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> Effect)
 {
+	if (Effect != nullptr && Effect->IsValidLowLevel() == false) return false;
 	TSubclassOf<UTopDownerGameplayEffect>& EffectRef = Effect;
 
-	FGameplayEffectContextHandle EffectContext = MakeEffectContext();
-	EffectContext.AddSourceObject(Giver);
+	UAbilitySystemComponent* Comp;
 
+	IAbilitySystemInterface* TheInterface = Cast<IAbilitySystemInterface>(Giver);
+	if (TheInterface != nullptr)
+	{
+		Comp = TheInterface->GetAbilitySystemComponent();
+	}
+	else
+	{
+		Comp = this;
+	}
+	
+	FGameplayEffectContextHandle EffectContext = Comp->MakeEffectContext();
+	
 	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(Effect, 1, EffectContext);
 	FActiveGameplayEffectHandle EffectHandle;
 	
 	if(EffectSpecHandle.IsValid())
 	{
 		TObjectPtr<UTopDownerGameplayEffect> effect = EffectRef.GetDefaultObject();
-		EffectHandle = ApplyGameplayEffectToSelf(effect, 1, EffectContext);
+		EffectHandle = ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
 
 	return EffectHandle.IsValid();

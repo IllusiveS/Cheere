@@ -49,8 +49,16 @@ void UCombatControllerSubsystem::Initialize(FSubsystemCollectionBase& Collection
 ACombatController* UCombatControllerFunctionLibrary::GetCombatController(const UObject* WorldContextObject)
 {
 	if (WorldContextObject == nullptr) return nullptr;
-	if (const auto Subsystem = WorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UCombatControllerSubsystem>())
+
+	auto World = WorldContextObject->GetWorld();
+	auto GameInstance = World->GetGameInstance();
+	auto Subsystem = GameInstance->GetSubsystem<UCombatControllerSubsystem>();
+	if (Subsystem)
 	{
+		if (Subsystem->CombatController == nullptr)[[unlikely]]
+		{
+			Subsystem->CombatController = World->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
+		}
 		return Subsystem->CombatController;
 	}
 	return nullptr;

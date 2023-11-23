@@ -32,7 +32,7 @@ AIdentityRoom::AIdentityRoom()
 
 	auto SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(SceneRoot);
-
+	
 	RoomRange = CreateDefaultSubobject<UBoxComponent>(TEXT("Range"));
 	RoomRange->SetupAttachment(GetRootComponent());
 	RoomRange->OnComponentBeginOverlap.AddDynamic(this, &AIdentityRoom::OnActorEntered);

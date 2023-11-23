@@ -31,7 +31,7 @@ public:
 	float PointsGainedPerSlotCharged {0.0f};
 
 	UPROPERTY(EditAnywhere)
-	float BaseGain {0.1f};
+	float BaseGain {0.0f};
 	
 	UPROPERTY(EditAnywhere)
 	int NumberOfBatteriesToSpawn {0};

@@ -55,7 +55,7 @@ ACombatController* UCombatControllerFunctionLibrary::GetCombatController(const U
 	auto Subsystem = GameInstance->GetSubsystem<UCombatControllerSubsystem>();
 	if (Subsystem)
 	{
-		if (Subsystem->CombatController == nullptr)[[unlikely]]
+		if (Subsystem->CombatController == nullptr)
 		{
 			Subsystem->CombatController = World->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
 		}

@@ -99,7 +99,7 @@ void USpawnEnemiesNode::ExecuteInput(const FName& PinName)
 						if (DelayBetweenSpawns != 0.0)
 						{
 							FTimerHandle handle;
-							target->GetOwner()->GetWorld()->GetTimerManager().SetTimer(handle, [=]()
+							target->GetOwner()->GetWorld()->GetTimerManager().SetTimer(handle, [=, this]()
 							{
 								FinishSpawnFunction(target.Get(), EnemySpawner, pair.Key);
 							}, (WholeSpawnNumber + 1) * DelayBetweenSpawns, false);

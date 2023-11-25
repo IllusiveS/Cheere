@@ -22,7 +22,6 @@ AEnemyRobot::AEnemyRobot()
 	BasicEntityAttributes = CreateDefaultSubobject<UBasicCharacterAttributeSet>(TEXT("HealthAttributes"));
 	FearAttributes = CreateDefaultSubobject<UFearAttributeSet>(TEXT("FearAttributes"));
 	MovementAttributes = CreateDefaultSubobject<UMovementAttributeSet>(TEXT("MovementAttributes"));
-	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetMaxWalkSpeedAttribute())
 		.AddUObject(this, &AEnemyRobot::WalkSpeedChanged);

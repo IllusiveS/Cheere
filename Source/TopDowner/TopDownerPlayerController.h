@@ -84,6 +84,9 @@ public:
 	
 	UFUNCTION(Exec)
 	void KillAllEnemies();
+
+	UFUNCTION(Exec)
+	void InfiniteAmmo();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

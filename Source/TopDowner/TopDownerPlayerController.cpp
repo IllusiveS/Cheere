@@ -45,6 +45,15 @@ void ATopDownerPlayerController::KillAllEnemies()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyRobot::StaticClass(), FoundActors);
 }
 
+void ATopDownerPlayerController::InfiniteAmmo()
+{
+	auto character = Cast<ATopDownerCharacter>(GetPawn());
+	if (character)
+	{
+		
+	}
+}
+
 void ATopDownerPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings

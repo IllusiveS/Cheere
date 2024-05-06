@@ -54,6 +54,7 @@ ATopDownerCharacter::ATopDownerCharacter()
 
 	CameraBoomParent = CreateDefaultSubobject<USceneComponent>(TEXT("CameraParent"));
 	CameraBoomParent->SetupAttachment(GetRootComponent());
+	CameraBoomParent->SetRelativeRotation(FRotator(0.0));
 	
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -96,11 +97,22 @@ UAbilitySystemComponent* ATopDownerCharacter::GetAbilitySystemComponent() const
 void ATopDownerCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+	if (IsAiming)
+	{
+		const FInputActionValue Value;
+		Aim(Value);
+	}
 	//
 	// if(GEngine)
 	// 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::SanitizeFloat(DeltaSeconds * 35.0));	
 	
 	GetTopDownCameraComponent()->SetFieldOfView(FMath::Lerp(GetTopDownCameraComponent()->FieldOfView, TargetFov, DeltaSeconds * 10.0));
+}
+
+void ATopDownerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void ATopDownerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -190,7 +202,7 @@ void ATopDownerCharacter::BeginAim(const FInputActionValue& Value)
 		Subsystem->AddMappingContext(FiringMappingContext, 0);
 	}
 
-	SetActorRotation(FRotator());
+	SetActorRotation(FRotator::ZeroRotator);
 	TargetFov = AimingFov;
 	
 	BeginAiming();
@@ -238,7 +250,7 @@ void ATopDownerCharacter::Aim(const FInputActionValue& Value)
 	bool bHitSuccessful = false;
 	
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	bHitSuccessful = PC->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, true, Hit);
+	bHitSuccessful = PC->GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel5, true, Hit);
 
 	// If we hit a surface, cache the location
 	if (bHitSuccessful == false)

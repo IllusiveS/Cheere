@@ -5,24 +5,30 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float DilationTime, bool ForceNew)
+void UTimeDilationSlowdownSubsystem::SetAimingSlowTime(float DilationAmount)
+{
+	CurrentAimingSlowdown = DilationAmount;
+}
+
+void UTimeDilationSlowdownSubsystem::SlowTime(float DilationAmount, float DilationTime, bool ForceNew, TEnumAsByte<ESlowdownType> SlowdownType)
 {
 	if (GetWorld()->GetTimerManager().IsTimerActive(CurrentSlowdownHandle))
 	{
-		if (CurrentSlowdownAmount >= DilationAmount && ForceNew == false) return;
+		if (SlowdownType >= CurrentSlowdown && ForceNew == false) return;
 		
 		GetWorld()->GetTimerManager().ClearTimer(CurrentSlowdownHandle);
 	}
 
-	const auto TimerScaledTime = DilationTime * DilationAmount;
+	const auto TimerScaledTime = DilationTime * DilationAmount * CurrentAimingSlowdown;
 	GetWorld()->GetTimerManager().SetTimer(CurrentSlowdownHandle, this, &UTimeDilationSlowdownSubsystem::OnSlowTimeEnded, TimerScaledTime);
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), DilationAmount);
 
-	CurrentSlowdownAmount = DilationAmount;
+	CurrentSlowdownAmount = DilationAmount * CurrentAimingSlowdown;
+	CurrentSlowdown = SlowdownType;
 }
 
 void UTimeDilationSlowdownSubsystem::OnSlowTimeEnded()
 {
-	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), CurrentAimingSlowdown);
 	GetWorld()->GetTimerManager().ClearTimer(CurrentSlowdownHandle);
 }

@@ -10,6 +10,9 @@ public class TopDownerEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_2;
+		CppStandard = CppStandardVersion.Cpp20;
+		CppStandardEngine = CppStandardVersion.Cpp20;
 		ExtraModuleNames.Add("TopDowner");
+		ExtraModuleNames.Add("TopDownerEditor");
 	}
 }

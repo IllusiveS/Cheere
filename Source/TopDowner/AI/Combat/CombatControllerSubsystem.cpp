@@ -13,8 +13,12 @@ UCombatControllerSubsystem::UCombatControllerSubsystem()
 {
 }
 
-void UCombatControllerSubsystem::StartCombat()
+void UCombatControllerSubsystem::StartCombat(TMap<TSubclassOf<AEnemyRobot>, int> DesiredEnemies)
 {
+	if(CombatController == nullptr)
+	{
+		CombatController = GetWorld()->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
+	}
 	CombatController->RunBehaviorTree(CombatTree);
 
 	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
@@ -22,6 +26,8 @@ void UCombatControllerSubsystem::StartCombat()
 	auto BB = CombatController->GetBlackboardComponent();
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredSpecialEnemiesActive", SGSettings->DesiredSpecialEnemyAmount);
 	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredBasicEnemiesActive", SGSettings->DesiredBasicEnemyAmount);
+	CombatController->GetBlackboardComponent()->SetValueAsInt("DesiredNumberOfMeleeActive", SGSettings->DesiredMeleeEnemyAmount);
+	CombatController->DesiredEnemies = DesiredEnemies;
 	CombatController->BeginCombat();
 }
 
@@ -37,15 +43,22 @@ void UCombatControllerSubsystem::Initialize(FSubsystemCollectionBase& Collection
 	CombatController = GetWorld()->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
 	
 	const UCombatSystemDeveloperSettings* SGSettings = GetDefault<UCombatSystemDeveloperSettings>();
-	
 	CombatTree = SGSettings->CombatTree.LoadSynchronous();
 }
 
 ACombatController* UCombatControllerFunctionLibrary::GetCombatController(const UObject* WorldContextObject)
 {
 	if (WorldContextObject == nullptr) return nullptr;
-	if (const auto Subsystem = WorldContextObject->GetWorld()->GetGameInstance()->GetSubsystem<UCombatControllerSubsystem>())
+
+	auto World = WorldContextObject->GetWorld();
+	auto GameInstance = World->GetGameInstance();
+	auto Subsystem = GameInstance->GetSubsystem<UCombatControllerSubsystem>();
+	if (Subsystem)
 	{
+		if (Subsystem->CombatController == nullptr)
+		{
+			Subsystem->CombatController = World->SpawnActor<ACombatController>(ACombatController::StaticClass(), FVector{0.0f}, FRotator{0.0});
+		}
 		return Subsystem->CombatController;
 	}
 	return nullptr;

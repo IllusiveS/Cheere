@@ -17,15 +17,15 @@ class TOPDOWNER_API UCombatControllerSubsystem : public UGameInstanceSubsystem
 
 public:
 	UCombatControllerSubsystem();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class UBehaviorTree* CombatTree;
+	class UBehaviorTree* CombatTree{nullptr};
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ACombatController> CombatController;
 
-	UFUNCTION()
-	void StartCombat();
+	UFUNCTION(BlueprintCallable)
+	void StartCombat(TMap<TSubclassOf<class AEnemyRobot>, int> DesiredEnemies);
 
 	UFUNCTION()
 	void EndCombat();

@@ -22,7 +22,6 @@ AEnemyRobot::AEnemyRobot()
 	BasicEntityAttributes = CreateDefaultSubobject<UBasicCharacterAttributeSet>(TEXT("HealthAttributes"));
 	FearAttributes = CreateDefaultSubobject<UFearAttributeSet>(TEXT("FearAttributes"));
 	MovementAttributes = CreateDefaultSubobject<UMovementAttributeSet>(TEXT("MovementAttributes"));
-	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(MovementAttributes->GetMaxWalkSpeedAttribute())
 		.AddUObject(this, &AEnemyRobot::WalkSpeedChanged);
@@ -101,23 +100,24 @@ void AEnemyRobot::ChangeGroup(AEnemyGroup* Group)
 	GroupImAPartOf = Group;
 }
 
+bool AEnemyRobot::ActivateByEnum_Implementation(EActivationType Activation)
+{
+	ActivationType = Activation;
+	OnEnemyActivated.Broadcast(this, Activation);
+	return true;
+}
+
 bool AEnemyRobot::ActivateLow_Implementation()
 {
-	ActivationType = EActivationType::Low;
-	OnEnemyActivatedLow.Broadcast(this);
-	return true;
+	return ActivateByEnum(EActivationType::Low);
 }
 
 bool AEnemyRobot::ActivateHigh_Implementation()
 {
-	ActivationType = EActivationType::High;
-	OnEnemyActivatedHigh.Broadcast(this);
-	return true;
+	return ActivateByEnum(EActivationType::High);
 }
 
 bool AEnemyRobot::ActivateNone_Implementation()
 {
-	ActivationType = EActivationType::None;
-	OnEnemyDeactivated.Broadcast(this);
-	return true;
+	return ActivateByEnum(EActivationType::None);
 }

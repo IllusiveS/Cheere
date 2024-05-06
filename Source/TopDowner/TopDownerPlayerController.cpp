@@ -1,15 +1,18 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TopDownerPlayerController.h"
+
+#include "EnemyRobot.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "TopDownerCharacter.h"
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "GAS/TopDownerAbilitySystemComponent.h"
+#include "AI/Combat/CombatController.h"
+#include "AI/Combat/CombatControllerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 ATopDownerPlayerController::ATopDownerPlayerController()
 {
@@ -27,6 +30,28 @@ void ATopDownerPlayerController::BeginPlay()
 	auto GASComponent = Cast<ATopDownerCharacter>(GetPawn())->AbilitySystemComponent;
 	//const auto FireAbilitySpec = GASComponent->BuildAbilitySpecFromClass(FireAbility, 0, 5);
 	//GASComponent->GiveAbility(FireAbilitySpec);
+}
+
+void ATopDownerPlayerController::StopRandomSpawning()
+{
+	if (auto CombatController = UCombatControllerFunctionLibrary::GetCombatController(this))
+	{
+		CombatController->DesiredEnemies.Empty();
+	}
+}
+void ATopDownerPlayerController::KillAllEnemies()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyRobot::StaticClass(), FoundActors);
+}
+
+void ATopDownerPlayerController::InfiniteAmmo()
+{
+	auto character = Cast<ATopDownerCharacter>(GetPawn());
+	if (character)
+	{
+		
+	}
 }
 
 void ATopDownerPlayerController::SetupInputComponent()

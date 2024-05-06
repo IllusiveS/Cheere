@@ -3,6 +3,9 @@
 
 #include "TopDownerAbilitySystemComponent.h"
 
+#include "Logging/StructuredLog.h"
+#include "TopDowner/TopDownerCharacter.h"
+
 void UTopDownerAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -16,26 +19,41 @@ void UTopDownerAbilitySystemComponent::InitCallbacks()
 
 void UTopDownerAbilitySystemComponent::InitEffects()
 {
-	for (const TSubclassOf<UTopDownerGameplayEffect> Effect : DefaultEffects)
+	for (const TSubclassOf<UTopDownerGameplayEffect> &Effect : DefaultEffects)
     {
-    	AddEffect(this, Effect);
+    	AddEffect(GetOwner(), Effect);
     }
 }
 
-void UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> Effect)
+bool UTopDownerAbilitySystemComponent::AddEffect(UObject* Giver, TSubclassOf<UTopDownerGameplayEffect> Effect)
 {
+	if (Effect != nullptr && Effect->IsValidLowLevel() == false) return false;
 	TSubclassOf<UTopDownerGameplayEffect>& EffectRef = Effect;
 
-	FGameplayEffectContextHandle EffectContext = MakeEffectContext();
-	EffectContext.AddSourceObject(Giver);
+	UAbilitySystemComponent* Comp;
 
+	IAbilitySystemInterface* TheInterface = Cast<IAbilitySystemInterface>(Giver);
+	if (TheInterface != nullptr)
+	{
+		Comp = TheInterface->GetAbilitySystemComponent();
+	}
+	else
+	{
+		Comp = this;
+	}
+	
+	FGameplayEffectContextHandle EffectContext = Comp->MakeEffectContext();
+	
 	FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingSpec(Effect, 1, EffectContext);
-
+	FActiveGameplayEffectHandle EffectHandle;
+	
 	if(EffectSpecHandle.IsValid())
 	{
 		TObjectPtr<UTopDownerGameplayEffect> effect = EffectRef.GetDefaultObject();
-		FActiveGameplayEffectHandle EffectHandle = ApplyGameplayEffectToSelf(effect, 1, EffectContext);
+		EffectHandle = ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
+
+	return EffectHandle.IsValid();
 }
 
 int UTopDownerAbilitySystemComponent::RunEvent(FGameplayTag EventTag, const FGameplayEventData Payload)
@@ -95,6 +113,31 @@ TArray<FGameplayAbilitySpecHandle> UTopDownerAbilitySystemComponent::RunGameplay
 	return HandlesToReturn;
 }
 
+bool UTopDownerAbilitySystemComponent::CanActivateAnyAbility(FGameplayTag Tag, const FGameplayEventData Payload)
+{
+	TArray<FGameplayAbilitySpec> Specs = GetActivatableAbilities();
+	const FGameplayAbilityActorInfo* ActorInfo = AbilityActorInfo.Get();
+	for (const FGameplayAbilitySpec& Spec : Specs)
+	{
+		if (Spec.Ability == nullptr)
+		{
+			continue;
+		}
+		if (Spec.Ability->ShouldAbilityRespondToEvent(ActorInfo, &Payload))
+		{
+			return true;
+		}
+		// TArray<FAbilityTriggerData>& Triggers = Spec.Ability->AbilityTriggers;
+		// for (const FAbilityTriggerData& Data : Triggers)
+		// {
+		// 	if (Data.TriggerTag == Tag && Spec.Ability->ShouldAbilityRespondToEvent(ActorInfo, &Payload))
+		// 	{
+		// 		return true;
+		// 	}
+		// }
+	}
+	return false;
+}
 void UTopDownerAbilitySystemComponent::GetDamagedTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	unimplemented();

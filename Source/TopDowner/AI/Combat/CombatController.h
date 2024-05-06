@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "TopDowner/EnemyEnums.h"
+#include "GameplayTagContainer.h"
 #include "CombatController.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -19,11 +20,17 @@ class IAICombatInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
+	bool ActivateByEnum(EActivationType Activation);
+	virtual bool ActivateByEnum_Implementation(EActivationType Activation){return false;}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateLow();
 	virtual bool ActivateLow_Implementation(){return false;}
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateHigh();
 	virtual bool ActivateHigh_Implementation(){return false;}
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="CombatAI")
 	bool ActivateNone();
 	virtual bool ActivateNone_Implementation(){return false;}
@@ -76,13 +83,17 @@ public:
 
 	//Single Unit Controls
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	class AEnemyRobot* GetRandomUnactiveEnemy(TEnumAsByte<EEnemyType> EnemyType) const;
+	class AEnemyRobot* GetRandomUnactiveEnemy(EEnemyType EnemyType) const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveBasicEnemy() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int GetNumberOfBasicEnemies();
+	int GetNumberOfBasicEnemies() const;
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	int GetNumberOfActiveBasicEnemies();
+	int GetNumberOfActiveBasicEnemies() const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumberOfActiveMeleeEnemies() const;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flow")
+	FGameplayTagContainer IdentityTags;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class AEnemyRobot* GetRandomUnactiveSpecialEnemy() const;
@@ -99,6 +110,20 @@ public:
 	void ReactToEnemyDeactivated(class AEnemyRobot* Enemy);
 	UFUNCTION()
 	void ReactToEnemyDied(class AEnemyRobot* Enemy);
+	
+	UFUNCTION()
+	void ReactToEnemyActivationChange(class AEnemyRobot* Enemy, EActivationType Activation);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetDesiredNumOfUnits(TSubclassOf<AEnemyRobot> ClassToTest) const;
+
+	UFUNCTION(BlueprintPure)
+	int GetNumOfEnemiesByActivation(EActivationType Activation) const;
+
+	UPROPERTY()
+	TMap<TSubclassOf<AEnemyRobot>, int> DesiredEnemies;
 	
 protected:
 	UPROPERTY()
@@ -119,12 +144,9 @@ protected:
 	//TODO turn to sets?
 	UPROPERTY()
 	TSet<class AEnemyRobot*> AllEnemiesInCombat;
+
 	UPROPERTY()
-	TArray<class AEnemyRobot*> NotActiveEnemiesInCombat;
-	UPROPERTY()
-	TArray<class AEnemyRobot*> LowActiveEnemiesInCombat;
-	UPROPERTY()
-	TArray<class AEnemyRobot*> HighActiveEnemiesInCombat;
+	TMap<class AEnemyRobot*, EActivationType> EnemyActivations;
 
 	UPROPERTY()
 	TArray<class AEnemyRobot*> AllEnemiesInCombatRequired;

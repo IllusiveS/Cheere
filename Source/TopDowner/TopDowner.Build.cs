@@ -8,6 +8,21 @@ public class TopDowner : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "NavigationSystem", "AIModule", "Niagara", "GameplayTasks", "EnhancedInput", "GameplayAbilities", "GameplayTags", "MotionWarping" });
+        PublicDependencyModuleNames.AddRange(new string[]
+        {
+	        "Core"
+	        , "CoreUObject"
+	        , "Engine"
+	        , "InputCore"
+	        , "NavigationSystem"
+	        , "AIModule"
+	        , "Niagara"
+	        , "GameplayTasks"
+	        , "EnhancedInput"
+	        , "GameplayAbilities"
+	        , "GameplayTags"
+	        , "MotionWarping"
+	        , "Objectives"
+        });
     }
 }

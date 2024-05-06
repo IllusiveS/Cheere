@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.2",
+	"EngineAssociation": "5.3",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -14,7 +14,19 @@
 				"AIModule",
 				"Flow",
 				"CoreUObject",
-				"DeveloperSettings"
+				"DeveloperSettings",
+				"UMG",
+				"EnhancedInput"
+			]
+		},
+		{
+			"Name": "TopDownerEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"FlowEditor",
+				"TopDowner",
+				"Engine"
 			]
 		}
 	],
@@ -96,6 +108,10 @@
 		},
 		{
 			"Name": "MotionWarping",
+			"Enabled": true
+		},
+		{
+			"Name": "Objectives",
 			"Enabled": true
 		}
 	]
